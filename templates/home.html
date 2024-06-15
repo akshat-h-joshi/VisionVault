@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
+   <!-- REMIXICONS CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+   <link rel="stylesheet" href="/static/css/home.css">
+   <title>Home Page</title>
+</head>
+<body>
+
+   <div class="container">
+       <!-- Sidebar Section -->
+       <aside>
+           <div class="toggle">
+               <div class="logo">
+                    <i class="icon ri-tree-fill"></i>
+                    <h2>Vision<span class="danger">Vault</span></h2>
+               </div>
+               <div class="close" id="close-btn">
+                   <span class="material-icons-sharp">
+                       close
+                   </span>
+               </div>
+           </div>
+
+           <div class="sidebar">
+               <a href="#" class="sidebar-button active" data-target="dashboard">
+                   <span class="material-icons-sharp">
+                       dashboard
+                   </span>
+                   <h3>Dashboard</h3>
+               </a>
+               <a href="#" class="sidebar-button" data-target="profile">
+                   <span class="material-icons-sharp">
+                       person_outline
+                   </span>
+                   <h3>Profile</h3>
+               </a>
+               <a href="#goals" class="sidebar-button" data-target="goals">
+                   <span class="material-icons-sharp">
+                       insights
+                   </span>
+                   <h3>Goals</h3>
+               </a>
+               <a href="#" class="sidebar-button" data-target="garden">
+                   <span class="material-icons-sharp">
+                       mail_outline
+                   </span>
+                   <h3>Garden</h3>
+                   <span class="message-count">27</span>
+               </a>
+               <a href="#" class="sidebar-button" data-target="journal">
+                   <span class="material-icons-sharp">
+                       receipt_long
+                   </span>
+                   <h3>Journal</h3>
+               </a>
+               <a href="#" class="sidebar-button" data-target="settings">
+                   <span class="material-icons-sharp">
+                       settings
+                   </span>
+                   <h3>Settings</h3>
+               </a>
+               <a href="#" class="sidebar-button">
+                   <span class="material-icons-sharp">
+                       logout
+                   </span>
+                   <h3>Logout</h3>
+               </a>
+           </div>
+       </aside>
+       <!-- End of Sidebar Section -->
+
+       <!-- Main Content -->
+       <main>
+           <!-- Analyses -->
+           <div class="page dashboard">
+                <h1>Dashboard</h1>
+                <div class="analyse">
+                    <div class="sales">
+                        <div class="status">
+                            <div class="info">
+                                <h3>Total Sales</h3>
+                                <h1>$65,024</h1>
+                            </div>
+                            <div class="progress">
+                                <svg>
+                                    <circle cx="38" cy="38" r="36"></circle>
+                                </svg>
+                                <div class="percentage">
+                                    <p>+81%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="visits">
+                        <div class="status">
+                            <div class="info">
+                                <h3>Site Visit</h3>
+                                <h1>24,981</h1>
+                            </div>
+                            <div class="progress">
+                                <svg>
+                                    <circle cx="38" cy="38" r="36"></circle>
+                                </svg>
+                                <div class="percentage">
+                                    <p>-48%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="searches">
+                        <div class="status">
+                            <div class="info">
+                                <h3>Searches</h3>
+                                <h1>14,147</h1>
+                            </div>
+                            <div class="progress">
+                                <svg>
+                                    <circle cx="38" cy="38" r="36"></circle>
+                                </svg>
+                                <div class="percentage">
+                                    <p>+21%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of Analyses -->
+    
+                <!-- New Users Section -->
+                <div class="new-users">
+                    <h2>New Users</h2>
+                    <div class="user-list">
+                        <div class="user">
+                            <img src="images/profile-2.jpg">
+                            <h2>Jack</h2>
+                            <p>54 Min Ago</p>
+                        </div>
+                        <div class="user">
+                            <img src="images/profile-3.jpg">
+                            <h2>Amir</h2>
+                            <p>3 Hours Ago</p>
+                        </div>
+                        <div class="user">
+                            <img src="images/profile-4.jpg">
+                            <h2>Ember</h2>
+                            <p>6 Hours Ago</p>
+                        </div>
+                        <div class="user">
+                            <img src="/static/img/plus.png">
+                            <h2>More</h2>
+                            <p>New User</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of New Users Section -->
+    
+                <!-- Recent Orders Table -->
+                <div class="recent-orders">
+                    <h2>Recent Orders</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Course Name</th>
+                                <th>Course Number</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <a href="#">Show All</a>
+                </div>
+                <!-- End of Recent Orders -->
+           </div>
+           <div class="page profile">
+                <h1>Profile</h1>    
+                <div class="profile-container">
+                    <h1>Elon Musk</h1>
+                    <img src="/static/img/profile.png" id="profile-pic">
+                    <label for="input-file">Update image</label>
+                    <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file">
+                </div>
+                <div class="info-container">
+
+                </div>
+           </div>
+           <div class="page journal">
+                <h1>Journal</h1>    
+           </div>
+           <div class="page goals">
+                <h1>Goals</h1>
+                <div class="goals-main-container">
+                    <div class="title-container">Categories</div>
+                    <div class="goals-categories-container">
+                        <div class="category" data-category="personal">Personal</div>
+                        <div class="category" data-category="professional">Professional</div>
+                        <div class="category" data-category="health">Health</div>
+                        <div class="category">Personal</div>
+                        <div class="category">Professional</div>
+                        <div class="category">Health</div>
+                        <div class="category">Personal</div>
+                        <div class="category">Professional</div>
+                        <div class="category">Health</div>
+                        <div class="category">Personal</div>
+                        <div class="category">Professional</div>
+                        <div class="category">Health</div>
+                        <div class="category">Personal</div>
+                        <div class="category">Professional</div>
+                        <div class="category">Health</div>
+                    </div>
+                    <div class="goals-sub-container">
+                        <!-- Add a Goal button -->
+                        <button id="addGoalButton" class="goal-button">Add Goal</button>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Goal Name</th>
+                                        <th>Due Date</th>
+                                        <th>Priority</th>
+                                        <th>Progress</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="goalsTable">
+                                    {% for goal in goals %}
+                                    <tr>
+                                        <td>{{ goal.goal_name }}</td>
+                                        <td>{{ goal.due_date }}</td>
+                                        <td>{{ goal.priority_level }}</td>
+                                        <td><!-- Add progress here --></td>
+                                        <td>
+                                            <button class="edit-goal-button" data-goal-id="{{ goal.id }}"></button>
+                                            <button class="delete-goal-button" data-goal-id="{{ goal.id }}"></button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                                <!-- New Goal Modal -->
+                    <div id="newGoalModal" class="modal">
+                        <div class="modal-content">
+                            <!-- <div class="error-message" id="main-info-error">Hello</div> -->
+                            <span class="close-button">&times;</span>
+                            <button id="continueButton" class="continue-button">Continue</button>
+                            <button id="backButton" class="back-button">Back</button>
+                            <button id="finaliseButton" class="finalise-button">Finalise</button>
+                            <h2>Add a New Goal</h2>
+                            <div class="tree-container">
+                                <button id="prev" class="arrow">&#9664;</button>
+                                <div class="tree-info">
+                                    <img id="tree-image" class='pine-tree' src="/static/img/pine-tree.png" alt="Tree">
+                                    <p id="tree-name">Pine Tree</p>
+                                </div>
+                                <button id="next" class="arrow">&#9654;</button>
+                            </div>
+                            <div class="main-info-container">
+                                <!-- Form content goes here -->
+                                <form id="goalForm" method="POST" action="/save_goal">
+                                    <label for="goalName">Goal Name:</label>
+                                    <input type="text" id="goalName" name="goalName" required>
+                                    
+                                    <label for="dueDate">Due Date:</label>
+                                    <input type="date" id="dueDate" name="dueDate" required>
+                                    
+                                    <label for="priorityLevel">Priority Level:</label>
+                                    <select id="priorityLevel" name="priorityLevel" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                                    
+                                    <label for="goalCategory">Category:</label>
+                                    <input type="text" id="goalCategory" name="goalCategory" required>
+                                    
+                                    <label for="description">Description:</label>
+                                    <textarea id="description" name="description" rows="4" required></textarea>
+                                </form>
+                            </div>
+                            <div class="sub-tasks-container">
+                                <div class="content-wrapper">
+                                    <div class="vertical-line"></div>
+                                    <div id="task-container" class="task-container">
+                                        <div class="task-content"></div>
+                                        <button id="add-task-button" class="add-task-button" onclick="addTasks()">+</button>
+                                    </div>
+                                </div>
+                                    
+                            </div>
+                        </div>
+                    </div>
+
+                                <!-- Edit Goal Modal -->
+                    <div id="editGoalModal" class="modal">
+                        <div id="editGoalModalContent" class="modal-content">
+                            <span class="close-button">&times;</span>
+                            <button id="continueButtonEdit" class="continue-button">Continue</button>
+                            <button id="backButtonEdit" class="back-button">Back</button>
+                            <h2>Edit Goal</h2>
+                            <div id="editGoalTreeContainer" class="tree-container">
+                                <div class="tree-info">
+                                    <img id="tree-image-edit" class='pine-tree' src="/static/img/pine-tree.png" alt="Tree">
+                                    <p id="tree-name-edit">Pine Tree</p>
+                                </div>
+                            </div>
+                            <div class="main-info-container">
+                                <form id="editGoalForm" method="POST" action="/update_goal">
+                                    <label for="editGoalName">Goal Name:</label>
+                                    <input type="text" id="editGoalName" name="goalName" required>
+                    
+                                    <label for="editDueDate">Due Date:</label>
+                                    <input type="date" id="editDueDate" name="dueDate" required>
+                    
+                                    <label for="editPriorityLevel">Priority Level:</label>
+                                    <select id="editPriorityLevel" name="priorityLevel" required>
+                                        <option value="">Select Priority</option>
+                                        <option value="high">High</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="low">Low</option>
+                                    </select>
+                    
+                                    <label for="editGoalCategory">Category:</label>
+                                    <input type="text" id="editGoalCategory" name="goalCategory" required>
+                    
+                                    <label for="editDescription">Description:</label>
+                                    <textarea id="editDescription" name="description" rows="4" required></textarea>
+                                </form>
+                            </div>
+                            <div class="sub-tasks-container">
+                                <div class="content-wrapper">
+                                    <div class="vertical-line"></div>
+                                    <div class="task-container" id="edit-task-container">
+                                        <button id="add-task-button-edit" class="add-task-button" onclick="addTasks()"> + </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="saveEditButton" class="finalise-button">Save</button>
+                        </div>
+                    </div>
+                </div>    
+           </div>
+           <div class="page garden">
+                <h1>Garden</h1>    
+           </div>
+           <div class="page settings">
+                <h1>Settings</h1>    
+           </div>
+           
+
+       </main>
+       <!-- End of Main Content -->
+
+       <!-- Right Section -->
+       <div class="right-section">
+           <div class="nav">
+               <button id="menu-btn">
+                   <span class="material-icons-sharp">
+                       menu
+                   </span>
+               </button>
+               <div class="dark-mode">
+                   <span class="material-icons-sharp active">
+                       light_mode
+                   </span>
+                   <span class="material-icons-sharp">
+                       dark_mode
+                   </span>
+               </div>
+
+           </div>
+           <!-- End of Nav -->
+
+           <div class="user-profile">
+               <div class="logo">
+                   <img src="/static/img/profile.png">
+                   <h2>Hey Akshat</h2>
+                   <p>Welcome to VisionVault!</p>
+               </div>
+           </div>
+
+           <div class="reminders">
+               <div class="header">
+                   <h2>Reminders</h2>
+                   <span class="material-icons-sharp">
+                       notifications_none
+                   </span>
+               </div>
+
+               <div class="notification">
+                   <div class="icon">
+                       <span class="material-icons-sharp">
+                           volume_up
+                       </span>
+                   </div>
+                   <div class="content">
+                       <div class="info">
+                           <h3>Workshop</h3>
+                           <small class="text_muted">
+                               08:00 AM - 12:00 PM
+                           </small>
+                       </div>
+                       <span class="material-icons-sharp">
+                           more_vert
+                       </span>
+                   </div>
+               </div>
+
+               <div class="notification deactive">
+                   <div class="icon">
+                       <span class="material-icons-sharp">
+                           edit
+                       </span>
+                   </div>
+                   <div class="content">
+                       <div class="info">
+                           <h3>Workshop</h3>
+                           <small class="text_muted">
+                               08:00 AM - 12:00 PM
+                           </small>
+                       </div>
+                       <span class="material-icons-sharp">
+                           more_vert
+                       </span>
+                   </div>
+               </div>
+
+               <div class="notification add-reminder">
+                   <div>
+                       <span class="material-icons-sharp">
+                           add
+                       </span>
+                       <h3>Add Reminder</h3>
+                   </div>
+               </div>
+
+           </div>
+       </div>
+
+
+   </div>
+
+   <script src="/static/js/home.js"></script>
+</body>
+</html>
+

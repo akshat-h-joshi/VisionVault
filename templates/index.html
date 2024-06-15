@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+   <!-- REMIXICONS CSS -->
+   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+   
+   
+
+   <!-- connecting to the style.css file -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='/css/styles.css') }}">
+
+
+   <title>Login & Registration Form</title>
+</head>
+<body>
+   <div class="container">
+       <div class="forms">
+           <!-- Login Form -->
+           <div class="form login">
+               <span class="title l-title">Login</span>
+
+               <form id="log-in" action="/login" method="POST" autocomplete="off">
+                   <!-- Inside the login form -->
+                   <div class="error-message" id="login-error"></div>
+                        
+
+                   <div class="input-field">
+                       <input type="text" class="input" id="email-login" placeholder=" " required autofocus autocomplete="off">
+                       <label for="email-login" class="login-label">Email</label>
+                       <i class="ri-mail-line"></i>
+                       <div class="error-message" id="login-email-error"></div>
+                   </div>
+
+                   <div class="input-field">
+                       <input type="password" id="password-login" class="password input" placeholder=" " required>
+                       <label for="password-login" class="login-label">Password</label>
+                       <i class="ri-lock-2-line login__icon"></i>
+                       <i class="ri-eye-off-line login__eye showHidePw"></i>
+                       <div class="error-message" id="login-password-error"></div>
+                   </div>
+
+
+                   <div class="checkbox-text">
+                       <div class="checkbox-content">
+                       <input type="checkbox" id="logCheck">
+                       <label for="logCheck" class="text">Remember me</label>
+                       </div>
+
+
+                       <a href="#" class="text forgot-password">Forgot password?</a>
+                   </div>
+
+
+                   <div class="input-field button">
+                       <input type="button" value="Login" required>
+                   </div>
+               </form>
+
+
+               <div class="login-signup">
+                   <span class="text">Don't have an account?
+                       <a href="#" class="text signup-link">Signup Now</a>
+                   </span>
+               </div>
+           </div>
+
+                <!-- Registration Form  -->
+
+            <div class="form signup">
+                <span class="title r-title">Registration</span>
+
+                <form id="registration" action="/register" method="POST" autocomplete="off">
+                    <!-- Inside the registration form -->
+                    <div class="error-message" id="registration-error"></div>
+                    <div class="input-field">
+                        <input type="text" name="name" class="input" id="name-signup" placeholder=" " required autofocus>
+                        <label for="name-signup" class="login-label">Name</label>
+                        <i class="ri-user-3-line login__icon"></i>
+                        <div class="error-message" id="name-error"></div>
+                    </div>
+
+
+                    <div class="input-field">
+                        <input type="text" name="email" class="input" id="email-signup" placeholder=" " required>
+                        <label for="email-signup" class="login-label">Email</label>
+                        <i class="ri-mail-line"></i>
+                        <div class="error-message" id="signup-email-error"></div>
+                    </div>
+
+
+                    <div class="input-field">
+                        <input type="password" name="password" class="input" id="password-signup" class="password input" placeholder=" " required>
+                        <label for="password-signup" class="login-label">Password</label>
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <div class="error-message" id="signup-password-error"></div>
+                    </div>
+
+
+                    <div class="input-field">
+                        <input type="password" name="confirm_password" id="confirm-password-signup" class="password input" placeholder=" " required>
+                        <label for="confirm-password-signup" class="login-label">Confirm Password</label>
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <i class="ri-eye-off-line login__eye showHidePw"></i>
+                        <div class="error-message" id="confirm-password-error"></div>
+                    </div>
+
+
+                    <div class="checkbox-text">
+                        <div class="checkbox-content">
+                        <input type="checkbox" id="sigCheck">
+                        <label for="sigCheck" class="text">I accept all terms & conditions</label>      <!-- make a t&c page -->
+                        </div>
+                    </div>
+
+
+                    <div class="input-field button">
+                        <input type="button" value="Register" required>
+                    </div>
+                </form>
+
+
+                <div class="login-signup">
+                    <span class="text">Have an account?
+                        <a href="#" class="text login-link">Login</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+       </div>
+   </div>
+
+
+   <!-- link to the js file -->
+   <script src="{{ url_for('static', filename='/js/main.js') }}"></script>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+</body>
+</html>

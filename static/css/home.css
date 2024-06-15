@@ -1,0 +1,1405 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root{
+    --color-primary: #6C9BCF;
+    --color-danger: #FF0060;
+    --color-success: #1B9C85;
+    --color-warning: #F7D060;
+    --color-white: #fff;
+    --color-info-dark: #7d8da1;
+    --color-dark: #363949;
+    --color-light: rgba(132, 139, 200, 0.18);
+    --color-dark-variant: #677483;
+    --color-background: #f6f6f9;
+
+    --card-border-radius: 2rem;
+    --border-radius-1: 0.4rem;
+    --border-radius-2: 1.2rem;
+
+    --card-padding: 1.8rem;
+    --padding-1: 1.2rem;
+
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+.dark-mode-variables{
+    --color-background: #181a1e;
+    --color-white: #202528;
+    --color-dark: #edeffd;
+    --color-dark-variant: #a3bdcc;
+    --color-light: rgba(0, 0, 0, 0.4);
+    --box-shadow: 0 2rem 3rem var(--color-light);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    appearance: 0;
+    border: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+html{
+    font-size: 14px;
+}
+
+body{
+    width: 100vw;
+    height: 100vh;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.88rem;
+    user-select: none;
+    overflow-x: hidden;
+    color: var(--color-dark);
+    background-color: var(--color-background);
+}
+
+a{
+    color: var(--color-dark);
+}
+
+img{
+    display: block;
+    width: 100%;
+    object-fit: cover;
+}
+
+h1{
+    font-weight: 800;
+    font-size: 1.8rem;
+}
+
+h2{
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+h3{
+    font-weight: 500;
+    font-size: 0.87rem;
+}
+
+small{
+    font-size: 0.76rem;
+}
+
+p{
+    color: var(--color-dark-variant);
+}
+
+b{
+    color: var(--color-dark);
+}
+
+.text-muted{
+    color: var(--color-info-dark);
+}
+
+.primary{
+    color: var(--color-primary);
+}
+
+.danger{
+    color: var(--color-danger);
+}
+
+.success{
+    color: var(--color-success);
+}
+
+.warning{
+    color: var(--color-warning);
+}
+
+.container{
+    display: grid;
+    width: 96%;
+    margin: 0 auto;
+    gap: 1.8rem;
+    grid-template-columns: 12rem auto 23rem;
+}
+
+aside{
+    height: 100vh;
+}
+
+aside .toggle{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.4rem;
+}
+
+aside .toggle .logo{
+    display: flex;
+    gap: 0.5rem;
+}
+
+aside .toggle .logo .icon {
+    width: 2rem;
+    height: 2rem;
+    font-size: 2rem;
+}
+
+aside .toggle .close{
+    padding-right: 1rem;
+    display: none;
+}
+
+aside .sidebar{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-white);
+    box-shadow: var(--box-shadow);
+    border-radius: 15px;
+    height: 88vh;
+    position: relative;
+    top: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar:hover{
+    box-shadow: none;
+}
+
+aside .sidebar a{
+    display: flex;
+    align-items: center;
+    color: var(--color-info-dark);
+    height: 3.7rem;
+    gap: 1rem;
+    position: relative;
+    margin-left: 2rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a span{
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+}
+
+aside .sidebar a:last-child{
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+}
+
+aside .sidebar a.active{
+    width: 100%;
+    color: var(--color-primary);
+    background-color: var(--color-light);
+    margin-left: 0;
+}
+
+aside .sidebar a.active::before{
+    content: '';
+    width: 6px;
+    height: 18px;
+    background-color: var(--color-primary);
+}
+
+aside .sidebar a.active span{
+    color: var(--color-primary);
+    margin-left: calc(1rem - 3px);
+}
+
+aside .sidebar a:hover{
+    color: var(--color-primary);
+}
+
+aside .sidebar a:hover span{
+    margin-left: 0.6rem;
+}
+
+aside .sidebar .message-count{
+    background-color: var(--color-danger);
+    padding: 2px 6px;
+    color: var(--color-white);
+    font-size: 11px;
+    border-radius: var(--border-radius-1);
+}
+
+.sidebar .sidebar-button{
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: inherit;
+}
+
+.page {
+    background: none;
+}
+
+.page.hidden {
+    display: none;
+}
+
+.form-hidden{
+    display: none;    
+}
+.dashboard {
+    border: none;
+}
+
+.profile {
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping if containers are too wide */
+    justify-content: flex-start; /* Adjust to space items side by side */
+    align-items: flex; /* Align items to the top */
+    width: 140%;
+    padding: 20px;
+    margin-top: -20px;
+    margin-left: -15px;
+    box-sizing: border-box;
+    /* border: 2px solid black; */
+}
+
+.profile .profile-container {
+    background-color: white;
+    margin-top: 50px;
+    height: 550px;
+    margin-bottom: 20px;
+    margin-left: -90px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-right: 20px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    transition: box-shadow 0.3s ease;
+    flex: 1; /* Allow flexibility but ensure they fit side by side */
+    /* border: 2px solid red; */
+}
+
+.profile .info-container {
+    background-color: white;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-right: 20px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    transition: box-shadow 0.3s ease;
+    flex: 1; /* Allow flexibility but ensure they fit side by side */
+    /* border: 2px solid red; */
+}
+
+.profile .profile-container:hover, .profile .info-container:hover {
+    box-shadow: none;
+}
+
+.profile .profile-container h1 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.8rem;
+    text-align: center;
+    padding: 20px 0;
+    /* border: 2px solid green; */
+}
+
+.profile-container label{
+    display: block;
+    width: 200px;
+    background: rgb(26, 125, 255);
+    color: white;
+    text-align: center;
+    padding: 12px;
+    margin: 10px auto;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.profile-container input{
+    display: none;
+}
+
+.profile-container img {
+    height: 250px;
+    width: 250px;
+    border-radius: 50%;
+    margin: 30px auto 50px;
+    display: block;
+    /* border: 2px solid brown; */
+}
+
+.journal {
+    border: none;
+}
+
+.goals {
+    border: none;
+}
+
+.goals .goals-main-container{
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    margin-top: 10px;
+    width: 1000px;
+    height: 550px;
+    margin-bottom: 40px;
+    margin-right: 20px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    transition: box-shadow 0.3s ease;
+    padding: 30px;
+    position: relative;
+}
+
+.goals .goals-main-container .title-container{
+    font-weight: 600;
+    margin-left: 33px;
+    font-size: 1.8rem;
+    width: 160px;
+    border-right: 2px solid black;
+    padding-right: 10px;
+}
+
+.goals .goals-categories-container{
+    position: absolute;
+    width: 600px;
+    top: 25px;
+    left: 250px;
+    display: flex;
+    flex-direction: row;
+    white-space: nowrap;
+    overflow-x: auto;
+
+}
+/* Hide scrollbar for webkit browsers (Chrome, Safari) */
+.goals .goals-categories-container::-webkit-scrollbar {
+    width: 0; /* Set width to 0 */
+    height: 0; /* Set height to 0 */
+}
+
+.goals .goals-categories-container::-webkit-scrollbar-track {
+    background: transparent; /* Make scrollbar track transparent */
+}
+
+.goals .goals-categories-container::-webkit-scrollbar-thumb {
+    background: transparent; /* Make scrollbar thumb transparent */
+}
+
+.category{
+    padding: 10px; /* Adjust padding as needed */
+    margin-right: 10px; /* Spacing between categories */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 1.2rem;
+    /* Add other styling as needed */
+}
+
+.goals .goals-sub-container{
+    flex: 1;
+    background-color: none;
+    border: 0.5px solid rgba(0, 0, 0, 0.5);
+    margin-top: 20px;
+    margin-left: 35px;
+    width: 850px;
+    height: 350px;
+    border-radius: 50px;
+    position: relative;
+}
+
+.goals-sub-container .table-container{
+    background-color: none;
+    width: 800px;
+    height: 325px;
+    border-radius: 50px;
+    position: relative;
+    padding: 10px;
+    margin-top: 20px;
+    overflow-y:auto;
+}
+
+.delete-goal-button{
+    background-image: url('/static/img/delete-icon.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.edit-goal-button{
+    background-image: url('/static/img/edit-icon.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    height: 20px;
+    width: 20px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.table-container::-webkit-scrollbar {
+    width:3px; /* Adjust the height of the scrollbar */
+}
+
+.table-container::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+.table-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
+
+.goals .goals-sub-container h2{
+    margin-bottom: 0.8rem;
+}
+
+.goals .goals-sub-container table{
+    background-color: var(--color-white);
+    width: 100%;
+    /* padding: var(--card-padding); */
+    text-align: center;
+    border-radius: var(--card-border-radius);
+    transition: all 0.3s ease;
+}
+
+.goals .goals-sub-container table tbody td{
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark-variant);
+}
+
+.goals .goals-sub-container table tbody tr:last-child td{
+    border: none;
+}
+
+.goals .goals-sub-container a{
+    text-align: center;
+    display: block;
+    margin: 1rem auto;
+    color: var(--color-primary);
+}
+
+.goals .goals-sub-container .goal-button{
+    background-color: var(--color-primary); /* Set background color */
+    color: white; /* Set text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    position: absolute;
+    right: 70px;
+    bottom: 20px;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; 
+    z-index: 2; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    position: relative;
+    background-color: var(--color-background);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10%;
+    margin-right: 15%;
+    margin-top: 5%;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+    height: 83%;
+    box-sizing: border-box;
+}
+
+.modal-content h2{
+    position: absolute;
+    left: 430px;
+    top: 20px;
+    font-size: 1.6rem;
+}
+
+.modal-content .sub-tasks-container, .modal-content .main-info-container {
+    background-color: white;
+    margin: 20px; 
+    height: 350px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    padding: 30px;
+    transition: opacity 0.18s ease;
+    overflow-y: auto;
+}
+
+.modal-content .tree-container {
+    background-color: white;
+    margin: 20px; 
+    height: 350px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    padding: 30px;
+    width: 325px;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.arrow {
+    position: absolute;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin: 0 10px;
+}
+
+#prev {
+    left: 10px;
+    z-index: 1;
+}
+
+#next {
+    right: 10px;
+    z-index: 1;
+}
+
+.arrow:hover {
+    background-color: #45a049;
+}
+
+.tree-info {
+    text-align: center;
+    margin-left: 75px;
+    margin-top: -30px;
+}
+
+#tree-image, #tree-image-edit {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: contain;
+    display: block;
+}
+
+.pine-tree {
+    margin-left: 5px;
+}
+
+.birch-tree {
+    margin-left: 5px;
+}
+
+.spruce-tree {
+    margin-left: 20px;
+}
+
+.cedar-tree {
+    margin-left: 15px;
+}
+
+#tree-name, #tree-name-edit {
+    font-size: 1.2em;
+    font-weight: bold;
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%);
+}
+
+.modal-content .sub-tasks-container {
+    width: 400px;
+    position: absolute;
+    left: 200%; /* Off-screen to the right */
+    opacity: 0;
+}
+
+.modal-content .sub-tasks-container .content-wrapper {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* vertical line in sub-tasks-container */
+.content-wrapper .vertical-line{
+    border-left: 1px solid black; 
+    margin-left: 30px;
+    height: 100%; 
+    z-index: 0;
+}
+
+.content-wrapper .task-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: -35px; /* Adjust the margin to align tasks with the vertical line */
+}
+
+.task-container .task-content {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    margin-left: 25px; /* Centers the task */
+    margin-bottom: 100px;
+    z-index: 0;
+}
+
+.task-content .clickable-area {
+    background-image: url('/static/img/task-empty.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    z-index: 1;
+}
+
+.clickable-area:hover{
+    background-image: url('/static/img/task-full.png');
+}
+
+.task-container .add-task-button {
+    display: block;
+    margin-left: 24px;
+    font-size: 24px;
+    z-index: 1;
+    cursor: pointer;
+    background: white;
+}
+
+.task-content .task-text {
+    position: absolute;
+    top: 40px;
+    left: 75px;
+    width: 150px;
+    font-size: 12px;
+    padding: 5px;
+    height: 50px;
+    color: black;
+    border: 0.2px solid #ccc;
+    border-radius: 5px;
+    /* margin-left: 50px; */
+    cursor: pointer;
+    overflow-y: auto;
+}
+
+.task-content .task-label {
+    position: absolute;
+    left: 75px;
+    /* margin-top: 2x; */
+    text-align: center;
+    width: 150px;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    /* margin-left: 50px; */
+    cursor: pointer;
+    overflow-x: auto;
+    white-space: nowrap; /* Prevent the text from wrapping */
+}
+
+.task-content .delete-task-button {
+    position: absolute;
+    left: 270px;
+    top: 10px;
+    background-image: url('/static/img/delete-icon.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.delete-task-button:hover{
+    top: 7.5px;
+    left: 267.5px;
+    height: 25px;
+    width: 25px;
+}
+
+/* Custom scrollbar styles */
+.task-content .task-label::-webkit-scrollbar {
+    height: 2px; /* Adjust the height of the scrollbar */
+}
+
+.task-content .task-label::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.task-content .task-label::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+.task-content .task-label::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
+
+.modal-content.modal-active .sub-tasks-container {
+    margin-left: 2%; /* Move into view */
+    opacity: 1; /* Visible */
+    transition: opacity 0.2s ease;
+    position: static;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-content .main-info-container {
+    width: 400px;
+    padding-left: 50px;
+    padding-right: 50px;
+    display: block;
+}
+
+.modal-content.modal-active .main-info-container{
+    position: absolute;
+    right: 200%;
+    opacity: 0;
+    transition: opacity 0.05s ease;
+}
+
+
+.modal-content .back-button,
+.modal-content .finalise-button {
+    display: none;
+    background-color: var(--color-primary); /* Set background color */
+    color: white; /* Set text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    position: absolute;
+}
+
+.modal-content .continue-button{
+    background-color: var(--color-primary); /* Set background color */
+    color: white; /* Set text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    position: absolute;
+    right: 70px;
+    bottom: 30px;
+}
+
+/* When modal is active, make both buttons visible and apply shared styles */
+.modal-content.modal-active .back-button,
+.modal-content.modal-active .finalise-button {
+    display: block;
+}
+
+.modal-content.modal-active .back-button {
+    left: 70px;
+    bottom: 30px;
+}
+
+.modal-content.modal-active .finalise-button {
+    right: 70px;
+    bottom: 30px; /* Ensure it's positioned correctly */
+}
+
+.modal-content.modal-active .continue-button {
+    display: none;
+}
+
+/* Hide scrollbar for webkit browsers (Chrome, Safari) */
+.modal-content .main-info-container::-webkit-scrollbar {
+    width: 0; /* Set width to 0 */
+    height: 0; /* Set height to 0 */
+}
+
+.modal-content .main-info-container::-webkit-scrollbar-track {
+    background: transparent; /* Make scrollbar track transparent */
+}
+
+.modal-content .main-info-container::-webkit-scrollbar-thumb {
+    background: transparent; /* Make scrollbar thumb transparent */
+}
+
+.modal-content .error-message {
+    position: absolute;
+    font-size: 18px;
+    padding: 10px;
+    right: 250px;
+    bottom: 30px;
+ }
+
+.main-info-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.main-info-container label {
+    margin-bottom: 5px;
+    display: block;
+    font-weight: bold;
+}
+
+.main-info-container input[type="text"],
+.main-info-container input[type="date"],
+.main-info-container select,
+.main-info-container textarea {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: 'Arial', sans-serif;
+}
+
+.main-info-container input[type="date"]{
+    caret-color: none; /* Prevent typing within the date field */
+}
+
+#dueDate::-webkit-calendar-picker-indicator {
+    background-color: white;
+    border-radius: 4px;
+    padding: 5px;
+}
+.main-info-container input[type="text"]:focus,
+.main-info-container input[type="date"]:focus,
+.main-info-container select:focus,
+.main-info-container textarea:focus {
+    outline: none;
+    border: 1px solid #4CAF50;
+}
+
+.main-info-container input[type="text"],
+.main-info-container input[type="date"],
+.main-info-container select,
+.main-info-container textarea,
+.main-info-container button {
+    width: calc(100% - 20px);
+}
+
+
+.modal-content .tree-container:hover, 
+.modal-content .main-info-container:hover,
+.modal-content .sub-tasks-container:hover {
+    box-shadow: none;
+}
+
+.close-button {
+    color: #aaa;
+    position: absolute;
+    right: 30px;;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Blur Effect */
+.blurred {
+    filter: blur(5px);
+}
+
+.goals-main-container:hover{
+    box-shadow: none;
+}
+
+.garden {
+    border: none;
+}
+
+.settings {
+    border: none;
+}
+
+main{
+    margin-top: 1.4rem;
+}
+
+main .analyse{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.6rem;
+}
+
+main .analyse > div{
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    margin-top: 1rem;
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+main .analyse > div:hover{
+    box-shadow: none;
+}
+
+main .analyse > div .status{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+main .analyse h3{
+    margin-left: 0.6rem;
+    font-size: 1rem;
+}
+
+main .analyse .progress{
+    position: relative;
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+}
+
+main .analyse svg{
+    width: 7rem;
+    height: 7rem;
+}
+
+main .analyse svg circle{
+    fill: none;
+    stroke-width: 10;
+    stroke-linecap: round;
+    transform: translate(5px, 5px);
+}
+
+main .analyse .sales svg circle{
+    stroke: var(--color-success);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
+
+main .analyse .visits svg circle{
+    stroke: var(--color-danger);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
+
+main .analyse .searches svg circle{
+    stroke: var(--color-primary);
+    stroke-dashoffset: -30;
+    stroke-dasharray: 200;
+}
+
+main .analyse .progress .percentage{
+    position: absolute;
+    top: -3px;
+    left: -1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+main .new-users{
+    margin-top: 1.3rem;
+}
+
+main .new-users .user-list{
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    margin-top: 1rem;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1.4rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+main .new-users .user-list:hover{
+    box-shadow: none;
+}
+
+main .new-users .user-list .user{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+main .new-users .user-list .user img{
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 0.4rem;
+    border-radius: 50%;
+}
+
+main .recent-orders{
+    margin-top: 1.3rem;
+}
+
+main .recent-orders h2{
+    margin-bottom: 0.8rem;
+}
+
+main .recent-orders table{
+    background-color: var(--color-white);
+    width: 100%;
+    padding: var(--card-padding);
+    text-align: center;
+    box-shadow: var(--box-shadow);
+    border-radius: var(--card-border-radius);
+    transition: all 0.3s ease;
+}
+
+main .recent-orders table:hover{
+    box-shadow: none;
+}
+
+main table tbody td{
+    height: 2.8rem;
+    border-bottom: 1px solid var(--color-light);
+    color: var(--color-dark-variant);
+}
+
+main table tbody tr:last-child td{
+    border: none;
+}
+
+main .recent-orders a{
+    text-align: center;
+    display: block;
+    margin: 1rem auto;
+    color: var(--color-primary);
+}
+
+.right-section{
+    margin-top: 1.4rem;
+}
+
+.right-section .nav{
+    display: flex;
+    justify-content: end;
+    gap: 2rem;
+}
+
+.right-section .nav button{
+    display: none;
+}
+
+.right-section .dark-mode{
+    background-color: var(--color-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 1.6rem;
+    width: 4.2rem;
+    cursor: pointer;
+    border-radius: var(--border-radius-1);
+}
+
+.right-section .dark-mode span{
+    font-size: 1.2rem;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.right-section .dark-mode span.active{
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: var(--border-radius-1);
+}
+
+.right-section .user-profile{
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 1rem;
+    background-color: var(--color-white);
+    padding: var(--card-padding);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.right-section .user-profile:hover{
+    box-shadow: none;
+}
+
+.right-section .user-profile img{
+    width: 11rem;
+    height: auto;
+    margin-bottom: 0.8rem;
+    border-radius: 50%;
+}
+
+.right-section .user-profile h2{
+    margin-bottom: 0.2rem;
+}
+
+.right-section .reminders{
+    margin-top: 2rem;
+}
+
+.right-section .reminders .header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+}
+
+.right-section .reminders .header span{
+    padding: 10px;
+    box-shadow: var(--box-shadow);
+    background-color: var(--color-white);
+    border-radius: 50%;
+}
+
+.right-section .reminders .notification{
+    background-color: var(--color-white);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.7rem;
+    padding: 1.4rem var(--card-padding);
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.right-section .reminders .notification:hover{
+    box-shadow: none;
+}
+
+.right-section .reminders .notification .content{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+    width: 100%;
+}
+
+.right-section .reminders .notification .icon{
+    padding: 0.6rem;
+    color: var(--color-white);
+    background-color: var(--color-success);
+    border-radius: 20%;
+    display: flex;
+}
+
+.right-section .reminders .notification.deactive .icon{
+    background-color: var(--color-danger);
+}
+
+.right-section .reminders .add-reminder{
+    background-color: var(--color-white);
+    border: 2px dashed var(--color-primary);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.right-section .reminders .add-reminder:hover{
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.right-section .reminders .add-reminder div{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+@media screen and (max-width: 1200px) {
+    .container{
+        width: 95%;
+        grid-template-columns: 7rem auto 23rem;
+    }
+
+    aside .logo h2{
+        display: none;
+    }
+
+    aside .sidebar h3{
+        display: none;
+    }
+
+    aside .sidebar a{
+        width: 5.6rem;
+    }
+
+    aside .sidebar a:last-child{
+        position: relative;
+        margin-top: 1.8rem;
+    }
+
+    main .analyse{
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    main .new-users .user-list .user{
+        flex-basis: 40%;
+    }
+
+    main .recent-orders {
+        width: 94%;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 2rem 0 0 0.8rem;
+    }
+
+    main .recent-orders table{
+        width: 83vw;
+    }
+
+    main table thead tr th:last-child,
+    main table thead tr th:first-child{
+        display: none;
+    }
+
+    main table tbody tr td:last-child,
+    main table tbody tr td:first-child{
+        display: none;
+    }
+
+}
+
+@media screen and (max-width: 768px) {
+    .container{
+        width: 100%;
+        grid-template-columns: 1fr;
+        padding: 0 var(--padding-1);
+    }
+
+    aside{
+        position: fixed;
+        background-color: var(--color-white);
+        width: 15rem;
+        z-index: 3;
+        box-shadow: 1rem 3rem 4rem var(--color-light);
+        height: 100vh;
+        left: -100%;
+        display: none;
+        animation: showMenu 0.4s ease forwards;
+    }
+
+    @keyframes showMenu {
+       to{
+        left: 0;
+       } 
+    }
+
+    aside .logo{
+        margin-left: 1rem;
+    }
+
+    aside .logo h2{
+        display: inline;
+    }
+
+    aside .sidebar h3{
+        display: inline;
+    }
+
+    aside .sidebar a{
+        width: 100%;
+        height: 3.4rem;
+    }
+
+    aside .sidebar a:last-child{
+        position: absolute;
+        bottom: 5rem;
+    }
+
+    aside .toggle .close{
+        display: inline-block;
+        cursor: pointer;
+    }
+
+    main{
+        margin-top: 8rem;
+        padding: 0 1rem;
+    }
+
+    main .new-users .user-list .user{
+        flex-basis: 35%;
+    }
+
+    main .recent-orders{
+        position: relative;
+        margin: 3rem 0 0 0;
+        width: 100%;
+    }
+
+    main .recent-orders table{
+        width: 100%;
+        margin: 0;
+    }
+
+    .right-section{
+        width: 94%;
+        margin: 0 auto 4rem;
+    }
+
+    .right-section .nav{
+        position: fixed;
+        top: 0;
+        left: 0;
+        align-items: center;
+        background-color: var(--color-white);
+        padding: 0 var(--padding-1);
+        height: 4.6rem;
+        width: 100%;
+        z-index: 2;
+        box-shadow: 0 1rem 1rem var(--color-light);
+        margin: 0;
+    }
+
+    .right-section .nav .dark-mode{
+        width: 4.4rem;
+        position: absolute;
+        left: 66%;
+    }
+
+    .right-section .profile .info{
+        display: none;
+    }
+
+    .right-section .nav button{
+        display: inline-block;
+        background-color: transparent;
+        cursor: pointer;
+        color: var(--color-dark);
+        position: absolute;
+        left: 1rem;
+    }
+
+    .right-section .nav button span{
+        font-size: 2rem;
+    }
+
+}
