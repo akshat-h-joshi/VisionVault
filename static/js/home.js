@@ -86,8 +86,6 @@ window.addEventListener('message', function(event) {
     }
 });
 
-
-
 const Orders = [
     {
         productName: 'JavaScript Tutorial',
@@ -133,13 +131,6 @@ function resetTasks() {
     for (let i = 1; i < tasks.length; i++) {
         tasks[i].remove();
     }
-    
-    // Add 2 more tasks (total of 3)
-    for (let i = tasks.length; i < 3; i++) {
-        const deleteButtonHtml = i > 0 ? '<div class="delete-task-button"></div>' : ''; // Add delete button for tasks 2 and 3
-        const newTask = createTaskContent('', '', deleteButtonHtml); // Create task with empty label and text
-        taskContainer.appendChild(newTask);
-    }
 }
 
 // Function to create task content
@@ -150,22 +141,15 @@ function createTaskContent(label, text) {
     const taskLabel = document.createElement('div');
     taskLabel.classList.add('task-label');
     taskLabel.contentEditable = true; // Make the label editable
-    taskLabel.textContent = label || 'Title:';
+    taskLabel.textContent = label || 'Title';
     taskContent.appendChild(taskLabel);
-
-    const deleteButton = document.createElement('div');
-    deleteButton.className = 'delete-task-button';
-    deleteButton.onclick = function() {
-        taskContent.remove(); // Remove the task div
-    };
-    taskContent.appendChild(deleteButton);
 
     const clickableArea = document.createElement('div');
     clickableArea.className = 'clickable-area';
     taskContent.appendChild(clickableArea);
 
     clickableArea.onclick = function() {
-        toggleInfo(taskText);
+        toggleInfo(taskContent);
     };
 
     const taskText = document.createElement('div');
@@ -180,7 +164,7 @@ function createTaskContent(label, text) {
 // Function to reset a single task content
 function resetTask(taskContent, hasDeleteButton) {
     const taskLabel = taskContent.querySelector('.task-label');
-    taskLabel.textContent = 'Title:';
+    taskLabel.textContent = 'Title';
     taskLabel.contentEditable = true;
 
     const taskText = taskContent.querySelector('.task-text');
@@ -295,7 +279,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 // Gather the task data
                 const tasks = [];
-                document.querySelectorAll('.task-container .task-content').forEach(task => {
+                document.querySelectorAll('#task-container .task-content').forEach(task => {
                     tasks.push({
                         label: task.querySelector('.task-label').textContent.trim(),
                         text: task.querySelector('.task-text').textContent.trim()
@@ -384,13 +368,32 @@ document.addEventListener("DOMContentLoaded", () => {
     function openEditModal(goalId) {
         console.log('Fetching goal data for goalId:', goalId); // Log goalId before fetch 
         fetch(`/get_goal/${goalId}`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Clear previous sub-tasks
-                    const taskContainer = document.getElementById('edit-task-container');
-                    taskContainer.innerHTML = '';
-                    
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Clear previous sub-tasks
+                const taskContainer = document.getElementById('task-container-edit');
+                const tasks = taskContainer.querySelectorAll('.task-content');
+
+                if (taskContainer) {
+                    // Log task container before clearing
+                    console.log('Task container before clearing:', taskContainer.innerHTML);
+
+                    // Clear existing task contents
+                    tasks.forEach(task => {
+                        task.remove();
+                    });
+
+                    // Log task container after clearing
+                    console.log('Task container after clearing:', taskContainer.innerHTML);
+
+                    // Reset all input fields
+                    document.getElementById('editGoalName').value = '';
+                    document.getElementById('editDueDate').value = '';
+                    document.getElementById('editPriorityLevel').value = '';
+                    document.getElementById('editGoalCategory').value = '';
+                    document.getElementById('editDescription').value = '';
+                        
                     // Populate main goal details
                     document.getElementById('editGoalName').value = data.goal.goalName;
                     document.getElementById('editDueDate').value = data.goal.dueDate;
@@ -399,32 +402,36 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById('editDescription').value = data.goal.description;
 
                     // Populate sub-tasks
-                    data.goal.tasks.forEach(task => {
-                        const taskContent = document.createElement('div');
-                        taskContent.classList.add('task-content');
+                    data.goal.tasks.forEach((task, index) => {
+                        const taskContent = createTaskContent(task.label, task.text); // Create task content with label and text
+                        endButton = taskContainer.querySelector('add-task-button');
 
-                        // Create label for task
-                        const taskLabel = document.createElement('div');
-                        taskLabel.className = 'task-label';
-                        taskLabel.textContent = task.label || 'Title:';
-                        taskContent.appendChild(taskLabel);
+                        // Add delete button for tasks if needed
+                        if (index > 0) {
+                            const deleteButton = document.createElement('div');
+                            deleteButton.className = 'delete-task-button';
+                            deleteButton.onclick = function () {
+                                taskContent.remove();
+                            };
+                            taskContent.appendChild(deleteButton);
+                        }
 
-                        // Create text area for task
-                        const taskText = document.createElement('textarea');
-                        taskText.className = 'task-text';
-                        taskText.value = task.text || '';
-                        taskContent.appendChild(taskText);
-
-                        taskContainer.appendChild(taskContent);
+                        // Append task content to task container
+                        taskContainer.insertBefore(taskContent, endButton);
                     });
 
+                    // Log task container after populating
+                    console.log('Task container after populating:', taskContainer.innerHTML);
                 } else {
-                    alert('Failed to load goal data: ' + data.message);
+                    console.error('Task container not found in DOM');
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            } else {
+                alert('Failed to load goal data: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 
     closeEditButton.onclick = function() {
@@ -491,7 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const description = document.getElementById('editDescription').value.trim();
 
         const tasks = [];
-        document.querySelectorAll('#edit-task-container .task-content').forEach(task => {
+        document.querySelectorAll('#task-container-edit .task-content').forEach(task => {
             tasks.push({
                 label: task.querySelector('.task-label').textContent.trim(),
                 text: task.querySelector('.task-text').value.trim()
@@ -597,7 +604,7 @@ function addTasks() {
     const newLabel = document.createElement('div');
     newLabel.className = 'task-label';
     newLabel.contentEditable = true; // Make the label editable
-    newLabel.textContent = 'Title:';
+    newLabel.textContent = 'Title';
     newTask.appendChild(newLabel);
 
     // Create delete button for task
@@ -639,8 +646,8 @@ function addTasks() {
     }
 }
 
-function toggleInfo(task) {
-    const taskText = task.querySelector('.task-text');
+function toggleInfo(taskContent) {
+    const taskText = taskContent.querySelector('.task-text');
 
     if (taskText.style.display === 'none') {
         taskText.style.display = 'block';
