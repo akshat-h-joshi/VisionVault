@@ -1,6 +1,11 @@
 from flask import request, jsonify, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from init import app,db
+from flask_migrate import Migrate
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 # Database model
 class User(db.Model):
@@ -16,6 +21,7 @@ class Goal(db.Model):
     goal_category = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(500))
     tree_selected = db.Column(db.String(50), nullable=False)
+    tree_stage = db.Column(db.Integer, default=1)  # Add tree stage field
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tasks = db.relationship('Task', backref='goal', lazy=True, cascade="all, delete-orphan")
 
@@ -24,6 +30,7 @@ class Task(db.Model):
     label = db.Column(db.String(150), nullable=False)
     text = db.Column(db.String(500), nullable=False)
     goal_id = db.Column(db.Integer, db.ForeignKey('goal.id'), nullable=False)
+    completed = db.Column(db.Boolean, default=False)
 
 @app.route('/')
 def index():
@@ -95,6 +102,7 @@ def save_goal():
         description = data['description']
         tree_selected = data['treeSelected']
         tasks_data = data['tasks']
+        tree_stage = 1  # Assuming default stage is 1, adjust as needed
 
         new_goal = Goal(
             user_id=user.id,
@@ -103,7 +111,8 @@ def save_goal():
             priority_level=priority_level,
             goal_category=goal_category,
             description=description,
-            tree_selected=tree_selected
+            tree_selected=tree_selected,
+            tree_stage=tree_stage
         )
 
         db.session.add(new_goal)
@@ -112,7 +121,8 @@ def save_goal():
         for task_data in tasks_data:
             label = task_data.get('label')
             text = task_data.get('text')
-            new_task = Task(label=label, text=text, goal_id=new_goal.id)
+            completed = task_data.get('completed', False)
+            new_task = Task(label=label, text=text, goal_id=new_goal.id, completed=completed)
             db.session.add(new_task)
 
         db.session.commit()
@@ -165,6 +175,20 @@ def update_goal(goal_id):
         goal.goal_category = data['goalCategory']
         goal.description = data['description']
         
+        # Clear existing tasks
+        Task.query.filter_by(goal_id=goal.id).delete()
+
+        # Add new tasks
+        for task in data['tasks']:
+            new_task = Task(
+                goal_id=goal.id, 
+                label=task['label'], 
+                text=task['text'], 
+                completed=task.get('completed', False)
+            )
+            db.session.add(new_task)
+        
+        # Commit the changes to the database
         db.session.commit()
         
         return jsonify(success=True), 200
@@ -179,7 +203,7 @@ def get_goal(goal_id):
             return jsonify(success=False, message="Goal not found."), 404
         
         # Convert tasks to a list of dictionaries
-        tasks = [{'label': task.label, 'text': task.text} for task in goal.tasks]
+        tasks = [{'id': task.id, 'label': task.label, 'text': task.text} for task in goal.tasks]
         
         goal_data = {
             'goalName': goal.goal_name,
@@ -187,9 +211,37 @@ def get_goal(goal_id):
             'priorityLevel': goal.priority_level,
             'goalCategory': goal.goal_category,
             'description': goal.description,
-            'tasks': tasks
+            'treeSelected': goal.tree_selected,
+            'treeStage': goal.tree_stage,
+            'tasks': tasks,
+            'id': goal.id
         }
         
         return jsonify(success=True, goal=goal_data), 200
     except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
+    
+@app.route('/complete_task/<int:task_id>', methods=['PUT'])
+def complete_task(task_id):
+    try:
+        data = request.get_json()
+        completed = data.get('completed')
+        task = Task.query.get(task_id)
+        
+        if not task:
+            return jsonify(success=False, message="Task not found."), 404
+
+        task.completed = completed
+        db.session.commit()
+
+        # Check goal completion status and update tree stage
+        goal = task.goal
+        total_tasks = len(goal.tasks)
+        completed_tasks = sum(1 for t in goal.tasks if t.completed)
+        tree_stage = completed_tasks / total_tasks * 4  # Calculate tree stage
+
+        return jsonify(success=True, tree_stage=tree_stage), 200
+    
+    except Exception as e:
+        logging.error(f"Error occurred in complete_task: {str(e)}")
         return jsonify(success=False, message=str(e)), 500
