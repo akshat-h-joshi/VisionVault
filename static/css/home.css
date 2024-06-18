@@ -587,29 +587,48 @@ aside .sidebar .message-count{
     text-align: center;
     margin-left: 75px;
     margin-top: -30px;
+    position: relative;
+    height: 400px;
+    width: 300px;
 }
 
 #tree-image, #tree-image-edit {
-    max-width: 200px;
-    max-height: 200px;
+    width: 200px;
+    height: 200px;
     object-fit: contain;
     display: block;
 }
 
 .pine-tree {
-    margin-left: 5px;
+    position: absolute;
+    right: 15%;
+    bottom: 25%;
 }
 
 .birch-tree {
-    margin-left: 5px;
+    position: absolute;
+    right: 15%;
+    bottom: 25%;
 }
 
 .spruce-tree {
-    margin-left: 20px;
+    position: absolute;
+    right: 15%;
+    bottom: 25%;
 }
 
 .cedar-tree {
-    margin-left: 15px;
+    position: absolute;
+    right: 15%;
+    bottom: 25%;
+}
+
+#tree-image-edit.tree-seed {
+    position: absolute;
+    right: 40%;
+    bottom: 25%;
+    height: 100px;
+    width: 100px;
 }
 
 #tree-name, #tree-name-edit {
@@ -617,8 +636,8 @@ aside .sidebar .message-count{
     font-weight: bold;
     position: absolute;
     bottom: 50px;
-    left: 50%;
-    bottom: 40px;
+    left: 33%;
+    bottom: 50px;
     transform: translateX(-50%);
 }
 
@@ -683,6 +702,16 @@ aside .sidebar .message-count{
     background: white;
 }
 
+.task-container .end-line {
+    display: block;
+    margin-left: 22px;
+    width: 18px;
+    z-index: 1;
+    cursor: pointer;
+    background: white;
+    border-top: 1px solid black;
+}
+
 .task-content .task-text {
     position: absolute;
     top: 40px;
@@ -733,6 +762,32 @@ aside .sidebar .message-count{
     height: 25px;
     width: 25px;
 }
+
+.task-content .complete-task-button {
+    position: absolute;
+    left: 270px;
+    top: 10px;
+    background-image: url('/static/img/tick-icon.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+}
+
+.completed {
+    opacity: 10%;
+}
+
+.complete-task-button:hover{
+    top: 7.5px;
+    left: 267.5px;
+    height: 25px;
+    width: 25px;
+}
+
+
 
 /* Custom scrollbar styles */
 .task-content .task-label::-webkit-scrollbar {
