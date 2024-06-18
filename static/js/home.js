@@ -133,10 +133,24 @@ function resetTasks() {
     }
 }
 
+function fetchGoal(goalId) {
+    return fetch(`/get_goal/${goalId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json());
+}
+
+
 // Function to create task content
-function createTaskContent(label, text) {
+function createTaskContent(goalId, taskId, label, text, completed) {
     const taskContent = document.createElement('div');
     taskContent.classList.add('task-content');
+    if (completed) {
+        taskContent.classList.add('completed');
+    }
 
     const taskLabel = document.createElement('div');
     taskLabel.classList.add('task-label');
@@ -150,6 +164,16 @@ function createTaskContent(label, text) {
 
     clickableArea.onclick = function() {
         toggleInfo(taskContent);
+    };
+
+    const tickIcon = document.createElement('div');
+    tickIcon.className = 'complete-task-button';
+    taskContent.appendChild(tickIcon);
+
+    // Functionality to mark task as completed
+    tickIcon.onclick = function() {
+        taskContent.classList.toggle('completed');
+        updateTreeStage(goalId);
     };
 
     const taskText = document.createElement('div');
@@ -176,6 +200,27 @@ function resetTask(taskContent, hasDeleteButton) {
     if (deleteButton) {
         deleteButton.style.display = hasDeleteButton ? 'block' : 'none';
     }
+}
+
+function updateTaskStatus(taskId, completed) {
+    fetch(`/complete_task/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ completed: completed })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Code for saving tree to db
+        } else {
+            alert('Failed to update task status: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 function resetTree() {
@@ -282,7 +327,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll('#task-container .task-content').forEach(task => {
                     tasks.push({
                         label: task.querySelector('.task-label').textContent.trim(),
-                        text: task.querySelector('.task-text').textContent.trim()
+                        text: task.querySelector('.task-text').textContent.trim(),
+                        completed: task.classList.contains('completed') // Assuming completed tasks have a 'completed' class
                     });
                 });
 
@@ -401,24 +447,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById('editGoalCategory').value = data.goal.goalCategory;
                     document.getElementById('editDescription').value = data.goal.description;
 
-                    // Populate sub-tasks
-                    data.goal.tasks.forEach((task, index) => {
-                        const taskContent = createTaskContent(task.label, task.text); // Create task content with label and text
-                        endButton = taskContainer.querySelector('add-task-button');
+                    console.log(data.goal.treeSelected);
 
-                        // Add delete button for tasks if needed
-                        if (index > 0) {
-                            const deleteButton = document.createElement('div');
-                            deleteButton.className = 'delete-task-button';
-                            deleteButton.onclick = function () {
-                                taskContent.remove();
-                            };
-                            taskContent.appendChild(deleteButton);
-                        }
+                    // Populate sub-tasks
+                    data.goal.tasks.forEach(task => {
+                        const taskContent = createTaskContent(data.goal.id, task.id, task.label, task.text, task.completed); // Create task content with label and text
+                        endButton = taskContainer.querySelector('.end-line');
 
                         // Append task content to task container
                         taskContainer.insertBefore(taskContent, endButton);
                     });
+
+                    // Update tree info
+                    const treeName = data.goal.treeSelected;
+                    const treeStage = data.goal.treeStage;
+                    updateTreeInfo(treeName, treeStage);
 
                     // Log task container after populating
                     console.log('Task container after populating:', taskContainer.innerHTML);
@@ -500,8 +543,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const tasks = [];
         document.querySelectorAll('#task-container-edit .task-content').forEach(task => {
             tasks.push({
+                id: task.getAttribute('data-task-id'), // Assuming each task has a data-task-id attribute
                 label: task.querySelector('.task-label').textContent.trim(),
-                text: task.querySelector('.task-text').value.trim()
+                text: task.querySelector('.task-text').textContent.trim(),
+                completed: task.classList.contains('completed') 
             });
         });
 
@@ -530,7 +575,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     row.querySelector('td:nth-child(3)').textContent = priorityLevel;
                     // Update other cells as necessary
                 }
-                editGoalModal.style.display = 'none';
+                updateTaskStatus(taskId, isCompleted);
+                resetModal(editGoalModal);
             } else {
                 alert('Failed to update goal: ' + data.message);
             }
@@ -658,7 +704,7 @@ function toggleInfo(taskContent) {
 
 // Apply click event listener and initial visibility for existing task
 document.addEventListener("DOMContentLoaded", function() {
-    const tasks = document.querySelectorAll('.task-container .task-content');
+    const tasks = document.querySelectorAll('#task-container .task-content');
     tasks.forEach(task => {
         // Create label for the task
         const newLabel = document.createElement('div');
@@ -714,4 +760,75 @@ function updateTree() {
     treeImage.src = currentTree.image;
     treeName.textContent = currentTree.name;
     treeImage.className = currentTree.className;
+}
+
+const treeStages = {
+    'Pine Tree': [
+        { image: '/static/img/seed-image.png', className: 'tree-seed' },
+        { image: '/static/img/pine-tree.png', className: 'pine-tree' },
+        { image: '/static/img/pine-tree-stage-3.png', className: 'pine-tree-stage-3' },
+        { image: '/static/img/pine-tree-stage-4.png', className: 'pine-tree-stage-4' }
+    ],
+    'Birch Tree': [
+        { image: '/static/img/seed-image.png', className: 'tree-seed' },
+        { image: '/static/img/birch-tree.png', className: 'birch-tree' },
+        { image: '/static/img/birch-tree-stage-3.png', className: 'birch-tree-stage-3' },
+        { image: '/static/img/birch-tree-stage-4.png', className: 'birch-tree-stage-4' }
+    ],
+    'Spruce Tree': [
+        { image: '/static/img/seed-image.png', className: 'tree-seed' },
+        { image: '/static/img/spruce-tree.png', className: 'spruce-tree' },
+        { image: '/static/img/spruce-tree-stage-3.png', className: 'spruce-tree-stage-3' },
+        { image: '/static/img/spruce-tree-stage-4.png', className: 'spruce-tree-stage-4' }
+    ],
+    'Cedar Tree': [
+        { image: '/static/img/seed-image.png', className: 'tree-seed' },
+        { image: '/static/img/cedar-tree.png', className: 'cedar-tree' },
+        { image: '/static/img/cedar-tree-stage-3.png', className: 'cedar-tree-stage-3' },
+        { image: '/static/img/cedar-tree-stage-4.png', className: 'cedar-tree-stage-4' }
+    ]
+};
+
+function updateTreeStage(goalId) {
+    fetchGoal(goalId)
+    .then(data => {
+        if (data.success) {
+            const totalTasks = data.goal.tasks.length;
+            const completedTasks = data.goal.tasks.filter(task => task.completed).length;
+            const treeStage = Math.ceil((completedTasks / totalTasks) * 3); // Calculate tree stage, adjusted for 3 stages
+
+            const treeImageEdit = document.getElementById('tree-image-edit');
+            const stageImages = treeStages[data.goal.treeSelected];
+            console.log(stageImages);
+            
+            if (stageImages && stageImages[treeStage]) {
+                treeImageEdit.src = stageImages[treeStage + 1].image; // Move to the next stage image
+                treeImageEdit.className = stageImages[treeStage + 1].className; // Set the class name
+            } else {
+                console.error('Invalid tree stage:', treeStage);
+            }
+        } else {
+            console.error('Failed to fetch goal data:', data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+
+function updateTreeInfo(treeName, treeStage) {
+    const treeImage = document.getElementById('tree-image-edit');
+    const treeNameElement = document.getElementById('tree-name-edit');
+
+    // Find the tree stages by its name
+    const stages = treeStages[treeName];
+
+    if (stages && stages[treeStage - 1]) {
+        const stageInfo = stages[treeStage - 1];
+        treeImage.src = stageInfo.image;
+        treeImage.className = stageInfo.className;
+        treeNameElement.textContent = treeName;
+    } else {
+        console.error('Invalid tree name or stage:', treeName, treeStage);
+    }
 }
