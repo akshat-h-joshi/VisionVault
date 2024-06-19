@@ -195,6 +195,7 @@
                         <div class="category" data-category="personal">Personal</div>
                         <div class="category" data-category="professional">Professional</div>
                         <div class="category" data-category="health">Health</div>
+                        <!-- Dynamically added categories will be here -->
                     </div>
                     <div class="goals-sub-container">
                         <!-- Add a Goal button -->
@@ -213,8 +214,8 @@
                                 </thead>
                                 <tbody id="goalsTable">
                                     {% for goal in goals %}
-                                    <tr>
-                                        <td>{{ goal.goal_name }}</td>
+                                    <tr data-category="{{ goal.goal_category }}">
+                                        <td class="goal-name-cell">{{ goal.goal_name }}</td>
                                         <td>{{ goal.due_date }}</td>
                                         <td>{{ goal.priority_level }}</td>
                                         <td><!-- Add progress here --></td>
