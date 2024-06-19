@@ -68,6 +68,18 @@ def register():
     session['user_email'] = new_user.email
     return jsonify(success=True), 200
 
+@app.route('/get_user_id', methods=['GET'])
+def get_user_id():
+    email = session.get('user_email')
+    if not email:
+        return jsonify({'error': 'User not logged in'}), 401
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    return jsonify({'user_id': user.id}), 200
+
 @app.route('/home')
 def home():
     # Retrieve the user from the session
@@ -290,3 +302,17 @@ def get_categories(user_id):
     categories = Category.query.filter_by(user_id=user_id).all()
     category_list = [{'id': category.id, 'name': category.name} for category in categories]
     return jsonify({'categories': category_list}), 200
+
+@app.route('/delete_category/<int:category_id>', methods=['DELETE'])
+def delete_category(category_id):
+    try:
+        category = Category.query.get(category_id)
+        if not category:
+            return jsonify(success=False, message="Category not found."), 404
+
+        db.session.delete(category)
+        db.session.commit()
+
+        return jsonify(success=True, message="Category deleted successfully."), 200
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
