@@ -394,6 +394,10 @@ aside .sidebar .message-count{
     /* Add other styling as needed */
 }
 
+.category.category-active{
+    font-weight: bold;
+}
+
 .goals .goals-sub-container{
     flex: 1;
     background-color: none;
@@ -415,6 +419,11 @@ aside .sidebar .message-count{
     padding: 10px;
     margin-top: 20px;
     overflow-y:auto;
+}
+
+.goal-name-cell {
+    overflow-x: auto;
+    max-width: 100px;
 }
 
 .delete-goal-button{
@@ -494,8 +503,29 @@ aside .sidebar .message-count{
     border-radius: 5px; /* Add border radius */
     cursor: pointer; /* Change cursor to pointer */
     position: absolute;
+    right: 200px;
+    bottom: 20px;
+}
+
+.goals .goals-sub-container .add-category-button{
+    background-color: var(--color-primary); /* Set background color */
+    color: white; /* Set text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    position: absolute;
     right: 70px;
     bottom: 20px;
+}
+
+.delete-category-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px;
+    margin-left: 5px; /* Adjust margin as needed */
+    cursor: pointer;
 }
 
 .modal {
@@ -629,6 +659,16 @@ aside .sidebar .message-count{
     bottom: 25%;
     height: 100px;
     width: 100px;
+}
+
+@keyframes tree-grow {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.tree-grow {
+    animation: tree-grow 1s ease-in-out;
 }
 
 #tree-name, #tree-name-edit {
@@ -787,6 +827,23 @@ aside .sidebar .message-count{
     width: 25px;
 }
 
+.goal-name-cell::-webkit-scrollbar {
+    height: 1px;
+}
+
+.goal-name-cell::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.goal-name-cell::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+.goal-name-cell::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
 
 
 /* Custom scrollbar styles */
