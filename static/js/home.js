@@ -172,8 +172,9 @@ function createTaskContent(goalId, taskId, label, text, completed) {
 
     // Functionality to mark task as completed
     tickIcon.onclick = function() {
-        taskContent.classList.toggle('completed');
-        updateTreeStage(goalId);
+        const isCompleted = taskContent.classList.toggle('completed');
+        console.log('Task Completed:', isCompleted);
+        updateTreeStage(goalId, isCompleted);
     };
 
     const taskText = document.createElement('div');
@@ -202,27 +203,6 @@ function resetTask(taskContent, hasDeleteButton) {
     }
 }
 
-function updateTaskStatus(taskId, completed) {
-    fetch(`/complete_task/${taskId}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ completed: completed })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Code for saving tree to db
-        } else {
-            alert('Failed to update task status: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
-
 function resetTree() {
     let originalTreeIndex = 0;
     currentIndex = originalTreeIndex;
@@ -249,6 +229,69 @@ function resetModal(modal) {
     }
 }
 
+// Function to add a new category
+function addCategory(user_id, category_name) {
+    fetch('/add_category', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ user_id: user_id, category_name: category_name }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to add category.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Category added successfully:', data);
+
+        // Update the dropdown menu with the updated list of categories
+        updateCategoryDropdown(user_id);
+    })
+    .catch(error => {
+        console.error('Error adding category:', error);
+        alert('Failed to add category. Please try again.');
+    });
+}
+
+// Function to update the dropdown menu with categories
+function updateCategoryDropdown(user_id) {
+    fetch(`/categories/${user_id}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch categories.');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const goalCategoryDropdown = document.getElementById('goalCategory');
+
+        // Remove dynamically added categories
+        const preMadeCategories = ['Personal', 'Professional', 'Health'];
+        for (let i = goalCategoryDropdown.options.length - 1; i >= 0; i--) {
+            const option = goalCategoryDropdown.options[i];
+            if (!preMadeCategories.includes(option.value)) {
+                goalCategoryDropdown.remove(i);
+            }
+        }
+
+        // Add categories from data to the dropdown
+        data.categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category.name;
+            option.textContent = category.name;
+            goalCategoryDropdown.appendChild(option);
+        });
+    })
+    .catch(error => {
+        console.error('Error fetching categories:', error);
+        alert('Failed to fetch categories. Please try again.');
+    });
+}
+
+
                     // ADD GOAL DOM LISTENER
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -262,6 +305,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const priorityLevelField = document.getElementById("priorityLevel");
     const goalCategoryField = document.getElementById("goalCategory");
     const descriptionField = document.getElementById("description");
+    const addCategoryButton = document.querySelector('.add-category-button');
+
+    updateCategoryDropdown(1);
+
+    // Add Category button click handler
+    addCategoryButton.addEventListener("click", () => {
+        const user_id = 1; // Replace with actual user id from your application
+        const category_name = prompt("Enter a new category:");
+        if (category_name && category_name.trim() !== "") {
+            addCategory(user_id, category_name);
+        }
+    });
 
     document.getElementById("addGoalButton").onclick = function() {
         document.body.appendChild(newGoalModal);  // Move the modal to the body
@@ -430,9 +485,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         task.remove();
                     });
 
-                    // Log task container after clearing
-                    console.log('Task container after clearing:', taskContainer.innerHTML);
-
                     // Reset all input fields
                     document.getElementById('editGoalName').value = '';
                     document.getElementById('editDueDate').value = '';
@@ -463,8 +515,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const treeStage = data.goal.treeStage;
                     updateTreeInfo(treeName, treeStage);
 
-                    // Log task container after populating
-                    console.log('Task container after populating:', taskContainer.innerHTML);
                 } else {
                     console.error('Task container not found in DOM');
                 }
@@ -539,17 +589,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const priorityLevel = document.getElementById('editPriorityLevel').value.trim();
         const goalCategory = document.getElementById('editGoalCategory').value.trim();
         const description = document.getElementById('editDescription').value.trim();
-
+    
         const tasks = [];
+        let completedTasks = 0;
+    
         document.querySelectorAll('#task-container-edit .task-content').forEach(task => {
+            const completed = task.classList.contains('completed');
+            if (completed) {
+                completedTasks++;
+            }
             tasks.push({
                 id: task.getAttribute('data-task-id'), // Assuming each task has a data-task-id attribute
                 label: task.querySelector('.task-label').textContent.trim(),
                 text: task.querySelector('.task-text').textContent.trim(),
-                completed: task.classList.contains('completed') 
+                completed: completed
             });
         });
-
+    
+        const totalTasks = tasks.length;
+        const treeStage = Math.max(1, Math.ceil((completedTasks / totalTasks) * 4));
+    
         fetch(`/update_goal/${goalId}`, {
             method: 'PUT',
             headers: {
@@ -561,6 +620,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 priorityLevel: priorityLevel,
                 goalCategory: goalCategory,
                 description: description,
+                treeStage: treeStage,
                 tasks: tasks
             })
         })
@@ -575,7 +635,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     row.querySelector('td:nth-child(3)').textContent = priorityLevel;
                     // Update other cells as necessary
                 }
-                updateTaskStatus(taskId, isCompleted);
                 resetModal(editGoalModal);
             } else {
                 alert('Failed to update goal: ' + data.message);
@@ -789,26 +848,49 @@ const treeStages = {
     ]
 };
 
-function updateTreeStage(goalId) {
+// Function to update tree stage
+function updateTreeStage(goalId, isIncrement) {
     fetchGoal(goalId)
     .then(data => {
         if (data.success) {
+            const treeClassName = data.goal.treeSelected;
             const totalTasks = data.goal.tasks.length;
-            const completedTasks = data.goal.tasks.filter(task => task.completed).length;
-            const treeStage = Math.ceil((completedTasks / totalTasks) * 3); // Calculate tree stage, adjusted for 3 stages
+
+            const completedTasks = Array.from(document.querySelectorAll('.task-content'))
+                                        .filter(task => task.classList.contains('completed')).length;
+
+            const adjustedCompletedTasks = isIncrement ? completedTasks : Math.max(0, completedTasks - 1);
+
+            const treeStage = Math.max(1, Math.ceil((adjustedCompletedTasks / totalTasks) * 4));
 
             const treeImageEdit = document.getElementById('tree-image-edit');
-            const stageImages = treeStages[data.goal.treeSelected];
-            console.log(stageImages);
-            
-            if (stageImages && stageImages[treeStage]) {
-                treeImageEdit.src = stageImages[treeStage + 1].image; // Move to the next stage image
-                treeImageEdit.className = stageImages[treeStage + 1].className; // Set the class name
+            const stageImages = treeStages[treeClassName];
+
+            console.log('Tree Class Name:', treeClassName);
+            console.log('Total Tasks:', totalTasks);
+            console.log('Completed Tasks:', completedTasks);
+            console.log('Adjusted Completed Tasks:', adjustedCompletedTasks);
+            console.log('Calculated Tree Stage:', treeStage);
+            console.log('Stage Images:', stageImages);
+
+            if (stageImages && stageImages[treeStage - 1]) {
+                const stageInfo = stageImages[treeStage - 1];
+                treeImageEdit.src = stageInfo.image;
+                treeImageEdit.className = stageInfo.className;
+                console.log('Tree Image Updated:', treeImageEdit.src, treeImageEdit.className);
+
+                // Add growth animation class
+                treeImageEdit.classList.add('tree-grow');
+
+                // Remove the growth animation class after the animation ends
+                treeImageEdit.addEventListener('animationend', () => {
+                    treeImageEdit.classList.remove('tree-grow');
+                }, { once: true });
             } else {
                 console.error('Invalid tree stage:', treeStage);
             }
         } else {
-            console.error('Failed to fetch goal data:', data.message);
+            alert('Failed to fetch goal data: ' + data.message);
         }
     })
     .catch(error => {
