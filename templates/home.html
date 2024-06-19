@@ -58,12 +58,6 @@
                    </span>
                    <h3>Journal</h3>
                </a>
-               <a href="#" class="sidebar-button" data-target="settings">
-                   <span class="material-icons-sharp">
-                       settings
-                   </span>
-                   <h3>Settings</h3>
-               </a>
                <a href="#" class="sidebar-button">
                    <span class="material-icons-sharp">
                        logout
@@ -201,22 +195,11 @@
                         <div class="category" data-category="personal">Personal</div>
                         <div class="category" data-category="professional">Professional</div>
                         <div class="category" data-category="health">Health</div>
-                        <div class="category">Personal</div>
-                        <div class="category">Professional</div>
-                        <div class="category">Health</div>
-                        <div class="category">Personal</div>
-                        <div class="category">Professional</div>
-                        <div class="category">Health</div>
-                        <div class="category">Personal</div>
-                        <div class="category">Professional</div>
-                        <div class="category">Health</div>
-                        <div class="category">Personal</div>
-                        <div class="category">Professional</div>
-                        <div class="category">Health</div>
                     </div>
                     <div class="goals-sub-container">
                         <!-- Add a Goal button -->
                         <button id="addGoalButton" class="goal-button">Add Goal</button>
+                        <button id="addCategoryButton" class="add-category-button">Add Category</button>
                         <div class="table-container">
                             <table>
                                 <thead>
@@ -280,7 +263,12 @@
                                     </select>
                                     
                                     <label for="goalCategory">Category:</label>
-                                    <input type="text" id="goalCategory" name="goalCategory" required>
+                                    <select id="goalCategory" name="goalCategory" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Personal">Personal</option>
+                                        <option value="Professional">Professional</option>
+                                        <option value="Health">Health</option>
+                                    </select>
                                     
                                     <label for="description">Description:</label>
                                     <textarea id="description" name="description" rows="4" required></textarea>
@@ -329,7 +317,12 @@
                                     </select>
                     
                                     <label for="editGoalCategory">Category:</label>
-                                    <input type="text" id="editGoalCategory" name="goalCategory" required>
+                                    <select id="editGoalCategory" name="goalCategory" required>
+                                        <option value="">Select Category</option>
+                                        <option value="Personal">Personal</option>
+                                        <option value="Professional">Professional</option>
+                                        <option value="Health">Health</option>
+                                    </select>
                     
                                     <label for="editDescription">Description:</label>
                                     <textarea id="editDescription" name="description" rows="4" required></textarea>
