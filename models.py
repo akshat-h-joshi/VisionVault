@@ -12,6 +12,12 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
+    categories = db.relationship('Category', backref='user', lazy=True, cascade="all, delete-orphan")
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 class Goal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -174,6 +180,7 @@ def update_goal(goal_id):
         goal.priority_level = data['priorityLevel']
         goal.goal_category = data['goalCategory']
         goal.description = data['description']
+        goal.tree_stage = data['treeStage']
         
         # Clear existing tasks
         Task.query.filter_by(goal_id=goal.id).delete()
@@ -184,7 +191,7 @@ def update_goal(goal_id):
                 goal_id=goal.id, 
                 label=task['label'], 
                 text=task['text'], 
-                completed=task.get('completed', False)
+                completed=task['completed']
             )
             db.session.add(new_task)
         
@@ -203,7 +210,7 @@ def get_goal(goal_id):
             return jsonify(success=False, message="Goal not found."), 404
         
         # Convert tasks to a list of dictionaries
-        tasks = [{'id': task.id, 'label': task.label, 'text': task.text} for task in goal.tasks]
+        tasks = [{'id': task.id, 'label': task.label, 'text': task.text, 'completed': task.completed} for task in goal.tasks]
         
         goal_data = {
             'goalName': goal.goal_name,
@@ -245,3 +252,41 @@ def complete_task(task_id):
     except Exception as e:
         logging.error(f"Error occurred in complete_task: {str(e)}")
         return jsonify(success=False, message=str(e)), 500
+
+# Route to add a new category for a user
+@app.route('/add_category', methods=['POST'])
+def add_category():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    category_name = data.get('category_name')
+
+    if not user_id or not category_name:
+        return jsonify({'error': 'User ID or Category name not provided'}), 400
+
+    # Check if the user exists
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    # Check if the category already exists for the user
+    existing_category = Category.query.filter_by(user_id=user_id, name=category_name).first()
+    if existing_category:
+        return jsonify({'error': 'Category already exists for this user'}), 400
+
+    # Create a new Category object and add it to the user
+    new_category = Category(name=category_name, user_id=user_id)
+    db.session.add(new_category)
+    db.session.commit()
+
+    return jsonify({'message': 'Category added successfully', 'category': category_name}), 200
+
+# Route to retrieve all categories for a user
+@app.route('/categories/<int:user_id>', methods=['GET'])
+def get_categories(user_id):
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    categories = Category.query.filter_by(user_id=user_id).all()
+    category_list = [{'id': category.id, 'name': category.name} for category in categories]
+    return jsonify({'categories': category_list}), 200
