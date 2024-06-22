@@ -3,6 +3,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from init import app,db
 from flask_migrate import Migrate
 import logging
+from datetime import datetime
+
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +15,13 @@ class User(db.Model):
     email = db.Column(db.String(150), unique=True, nullable=False)
     password = db.Column(db.String(150), nullable=False)
     categories = db.relationship('Category', backref='user', lazy=True, cascade="all, delete-orphan")
+    pine_tree_number = db.Column(db.Integer, default=0)
+    spruce_tree_number = db.Column(db.Integer, default=0)
+    birch_tree_number = db.Column(db.Integer, default=0)
+    cedar_tree_number = db.Column(db.Integer, default=0)
+    frame1_type = db.Column(db.String(50))  # Example: 'Pine Tree', 'Spruce Tree', etc.
+    frame2_type = db.Column(db.String(50))
+    frame3_type = db.Column(db.String(50))
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -30,6 +39,14 @@ class Goal(db.Model):
     tree_stage = db.Column(db.Integer, default=1)  # Add tree stage field
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     tasks = db.relationship('Task', backref='goal', lazy=True, cascade="all, delete-orphan")
+
+    @property
+    def total_tasks(self):
+        return len(self.tasks)
+
+    @property
+    def completed_tasks(self):
+        return len([task for task in self.tasks if task.completed])
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -112,7 +129,7 @@ def save_goal():
         user = User.query.filter_by(email=email).first()
         if not user:
             return jsonify(success=False, message="User not found."), 404
-
+        
         goal_name = data['goalName']
         due_date = data['dueDate']
         priority_level = data['priorityLevel']
@@ -172,7 +189,7 @@ def get_goals():
         # Fetch all goals from the database
         goals = Goal.query.all()
         # Convert goals to a list of dictionaries
-        goals_data = [{'id': goal.id, 'goalName': goal.goal_name, 'dueDate': goal.due_date, 'priorityLevel': goal.priority_level} for goal in goals]
+        goals_data = [{'id': goal.id, 'goalName': goal.goal_name, 'dueDate': goal.due_date, 'priorityLevel': goal.priority_level, 'goalCategory': goal.goal_category} for goal in goals]
         return jsonify(goals_data)  # Send goals as JSON response
     except Exception as e:
         print('Error fetching goals:', e)
@@ -303,16 +320,123 @@ def get_categories(user_id):
     category_list = [{'id': category.id, 'name': category.name} for category in categories]
     return jsonify({'categories': category_list}), 200
 
-@app.route('/delete_category/<int:category_id>', methods=['DELETE'])
-def delete_category(category_id):
-    try:
-        category = Category.query.get(category_id)
-        if not category:
-            return jsonify(success=False, message="Category not found."), 404
+@app.route('/get_category_name', methods=['GET'])
+def get_category_name():
+    category_name = request.args.get('category_name')
+    if not category_name:
+        return jsonify({'success': False, 'message': 'Category name not provided.'}), 400
 
+    category = Category.query.filter(Category.name.ilike(category_name)).first()
+    if not category:
+        return jsonify({'success': False, 'message': 'Category not found.'}), 404
+
+    return jsonify({'success': True, 'category_name': category.name}), 200
+
+@app.route('/delete_category_and_goals/<category_name>', methods=['DELETE'])
+def delete_category_and_goals(category_name):
+    try:
+        # Fetch the category to be deleted
+        category = Category.query.filter(Category.name.ilike(category_name)).first()
+        if not category:
+            return jsonify({'message': 'Category not found'}), 404
+
+        # Fetch and delete goals associated with this category
+        goals = Goal.query.filter(Goal.goal_category.ilike(category.name)).all()
+        for goal in goals:
+            db.session.delete(goal)
+
+        # Delete the category
         db.session.delete(category)
         db.session.commit()
 
-        return jsonify(success=True, message="Category deleted successfully."), 200
+        return jsonify({'message': 'Category and associated goals deleted successfully'}), 200
+    except Exception as e:
+        print('Error deleting category and goals:', e)
+        return jsonify({'message': 'Internal server error'}), 500
+    
+
+@app.route('/complete_goal/<int:goal_id>', methods=['POST'])
+def complete_goal(goal_id):
+    try:
+        goal = Goal.query.get(goal_id)
+        if not goal:
+            return jsonify(success=False, message="Goal not found."), 404
+
+        user = User.query.get(goal.user_id)
+        if not user:
+            return jsonify(success=False, message="User not found."), 404
+
+        tree_selected = goal.tree_selected
+        due_date = datetime.strptime(goal.due_date, '%Y-%m-%d').date()  # Convert due_date string to datetime.date object
+        today = datetime.now().date()
+        
+        if today <= due_date:
+            if tree_selected == 'Pine Tree':
+                user.pine_tree_number += 1
+            elif tree_selected == 'Spruce Tree':
+                user.spruce_tree_number += 1
+            elif tree_selected == 'Birch Tree':
+                user.birch_tree_number += 1
+            elif tree_selected == 'Cedar Tree':
+                user.cedar_tree_number += 1
+            else:
+                return jsonify(success=False, message="Invalid tree type."), 400
+
+            db.session.delete(goal)
+            db.session.commit()
+
+            return jsonify(success=True), 200
+        else:
+            db.session.delete(goal)
+            db.session.commit()
+            return jsonify(success=True, message="Goal completed, but your tree is unavailable since the due date has passed."), 200
+    
     except Exception as e:
         return jsonify(success=False, message=str(e)), 500
+
+@app.route('/check_tree_availability/<int:user_id>/<tree_type>', methods=['GET'])
+def check_tree_availability(user_id, tree_type):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify(success=False, message="User not found."), 404
+        
+        if tree_type == 'Pine Tree' and user.pine_tree_number > 0:
+            user.pine_tree_number -= 1
+            db.session.commit()
+            return jsonify(available=True)
+        elif tree_type == 'Spruce Tree' and user.spruce_tree_number > 0:
+            user.spruce_tree_number -= 1
+            db.session.commit()
+            return jsonify(available=True)
+        elif tree_type == 'Birch Tree' and user.birch_tree_number > 0:
+            user.birch_tree_number -= 1
+            db.session.commit()
+            return jsonify(available=True)
+        elif tree_type == 'Cedar Tree' and user.cedar_tree_number > 0:
+            user.cedar_tree_number -= 1
+            db.session.commit()
+            return jsonify(available=True)
+        else:
+            return jsonify(available=False, message=f"You don't have a {tree_type}.")
+    except Exception as e:
+        return jsonify(error=str(e)), 500
+    
+@app.route('/get_tree_state/<int:user_id>', methods=['GET'])
+def get_tree_state(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify(success=False, message="User not found."), 404
+        
+        # Construct JSON response with tree state
+        tree_state = {
+            'tree1_type': user.frame1_type,
+            'tree2_type': user.frame2_type,
+            'tree3_type': user.frame3_type
+            # Add more fields as needed for additional tree frames
+        }
+
+        return jsonify(tree_state)
+    except Exception as e:
+        return jsonify(error=str(e)), 500
