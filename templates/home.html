@@ -3,10 +3,14 @@
 <head>
    <meta charset="UTF-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <!-- ICONS REFERENCES -->
    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
-   <!-- REMIXICONS CSS -->
    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet">
+   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+   <!-- STYLES FILE -->
    <link rel="stylesheet" href="/static/css/home.css">
+
    <title>Home Page</title>
 </head>
 <body>
@@ -39,24 +43,17 @@
                    </span>
                    <h3>Profile</h3>
                </a>
-               <a href="#goals" class="sidebar-button" data-target="goals">
+               <a href="#" class="sidebar-button" data-target="goals">
                    <span class="material-icons-sharp">
                        insights
                    </span>
                    <h3>Goals</h3>
                </a>
                <a href="#" class="sidebar-button" data-target="garden">
-                   <span class="material-icons-sharp">
-                       mail_outline
-                   </span>
+                    <span class="material-symbols-outlined">
+                        forest
+                    </span>
                    <h3>Garden</h3>
-                   <span class="message-count">27</span>
-               </a>
-               <a href="#" class="sidebar-button" data-target="journal">
-                   <span class="material-icons-sharp">
-                       receipt_long
-                   </span>
-                   <h3>Journal</h3>
                </a>
                <a href="#" class="sidebar-button">
                    <span class="material-icons-sharp">
@@ -184,9 +181,6 @@
 
                 </div>
            </div>
-           <div class="page journal">
-                <h1>Journal</h1>    
-           </div>
            <div class="page goals">
                 <h1>Goals</h1>
                 <div class="goals-main-container">
@@ -214,11 +208,17 @@
                                 </thead>
                                 <tbody id="goalsTable">
                                     {% for goal in goals %}
-                                    <tr data-category="{{ goal.goal_category }}">
+                                    <tr data-category="{{ goal.goal_category }}" data-goal-id="{{ goal.id }}">
                                         <td class="goal-name-cell">{{ goal.goal_name }}</td>
                                         <td>{{ goal.due_date }}</td>
                                         <td>{{ goal.priority_level }}</td>
-                                        <td><!-- Add progress here --></td>
+                                        <td class="progress-cell">
+                                            {% if goal.total_tasks > 0 %}
+                                            {{ (goal.completed_tasks / goal.total_tasks) * 100 | round(2) }}%
+                                            {% else %}
+                                            0%
+                                            {% endif %}
+                                        </td>
                                         <td>
                                             <button class="edit-goal-button" data-goal-id="{{ goal.id }}"></button>
                                             <button class="delete-goal-button" data-goal-id="{{ goal.id }}"></button>
@@ -343,10 +343,23 @@
                 </div>    
            </div>
            <div class="page garden">
-                <h1>Garden</h1>    
-           </div>
-           <div class="page settings">
-                <h1>Settings</h1>    
+                <h1>Garden</h1>
+                <div class="garden-main-container">
+                    <div class="garden-background-container">
+                        <div class="garden-tree-container">
+                            <div class="tree-frame" id="tree1Frame"></div>
+                            <button id="addTreeButton1" class="add-tree-button" onclick="selectTree(1)">Add Tree</button>
+                        </div>
+                        <div class="garden-tree-container">
+                            <div class="tree-frame" id="tree2Frame"></div>
+                            <button id="addTreeButton2" class="add-tree-button" onclick="selectTree(2)">Add Tree</button>
+                        </div>
+                        <div class="garden-tree-container">
+                            <div class="tree-frame" id="tree3Frame"></div>
+                            <button id="addTreeButton3" class="add-tree-button" onclick="selectTree(3)">Add Tree</button>
+                        </div>
+                    </div>
+                </div>    
            </div>
            
 
