@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root{
-    --color-primary: #6C9BCF;
+    --color-primary:  rgb(26, 125, 255);
     --color-danger: #FF0060;
     --color-success: #1B9C85;
     --color-warning: #F7D060;
@@ -214,14 +214,6 @@ aside .sidebar a:hover span{
     margin-left: 0.6rem;
 }
 
-aside .sidebar .message-count{
-    background-color: var(--color-danger);
-    padding: 2px 6px;
-    color: var(--color-white);
-    font-size: 11px;
-    border-radius: var(--border-radius-1);
-}
-
 .sidebar .sidebar-button{
     display: flex;
     align-items: center;
@@ -261,7 +253,7 @@ aside .sidebar .message-count{
 }
 
 .profile .profile-container {
-    background-color: white;
+    background-color: var(--color-white);
     margin-top: 50px;
     height: 550px;
     margin-bottom: 20px;
@@ -277,7 +269,7 @@ aside .sidebar .message-count{
 }
 
 .profile .info-container {
-    background-color: white;
+    background-color: var(--color-white);
     margin-top: 50px;
     margin-bottom: 20px;
     padding-top: 20px;
@@ -306,7 +298,7 @@ aside .sidebar .message-count{
 .profile-container label{
     display: block;
     width: 200px;
-    background: rgb(26, 125, 255);
+    background: var(--color-primary);
     color: white;
     text-align: center;
     padding: 12px;
@@ -328,10 +320,6 @@ aside .sidebar .message-count{
     /* border: 2px solid brown; */
 }
 
-.journal {
-    border: none;
-}
-
 .goals {
     border: none;
 }
@@ -339,7 +327,7 @@ aside .sidebar .message-count{
 .goals .goals-main-container{
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--color-white);
     margin-top: 10px;
     width: 1000px;
     height: 550px;
@@ -520,8 +508,8 @@ aside .sidebar .message-count{
 }
 
 .delete-category-button {
-    background-color: red;
-    color: white;
+    background-color: var(--color-white);
+    color: red;
     border: none;
     padding: 5px;
     margin-left: 5px; /* Adjust margin as needed */
@@ -565,7 +553,7 @@ aside .sidebar .message-count{
 }
 
 .modal-content .sub-tasks-container, .modal-content .main-info-container {
-    background-color: white;
+    background-color: var(--color-white);
     margin: 20px; 
     height: 350px;
     border-radius: 50px;
@@ -576,7 +564,7 @@ aside .sidebar .message-count{
 }
 
 .modal-content .tree-container {
-    background-color: white;
+    background-color: var(--color-white);
     margin: 20px; 
     height: 350px;
     border-radius: 50px;
@@ -739,7 +727,7 @@ aside .sidebar .message-count{
     font-size: 24px;
     z-index: 1;
     cursor: pointer;
-    background: white;
+    background: var(--color-white);
 }
 
 .task-container .end-line {
@@ -748,7 +736,7 @@ aside .sidebar .message-count{
     width: 18px;
     z-index: 1;
     cursor: pointer;
-    background: white;
+    background: var(--color-white);
     border-top: 1px solid black;
 }
 
@@ -1036,6 +1024,81 @@ aside .sidebar .message-count{
 
 .garden {
     border: none;
+}
+
+.garden .garden-main-container{
+    background-color: var(--color-white);
+    margin-top: 10px;
+    width: 1000px;
+    height: 550px;
+    margin-bottom: 40px;
+    margin-right: 20px;
+    border-radius: 50px;
+    box-shadow: var(--box-shadow);
+    transition: box-shadow 0.3s ease;
+    padding: 30px;
+    position: relative;
+}
+
+.garden .garden-background-container{
+    margin-left: 65px;
+    margin-top: 20px;
+    width: 800px;
+    height: 450px;
+    background-image: url('/static/img/garden-background.png');
+    background-size: cover; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+}
+
+.garden-tree-container {
+    align-items: center;
+    margin-right: 50px;
+    margin-left: 50px;
+    height: 300px;
+    position: relative;
+    margin-top: 50px;
+}
+
+.tree-frame {
+    width: 150px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('/static/img/plus-blue.png');
+    background-size: contain; /* Ensures the image covers the entire element */
+    background-repeat: no-repeat; /* Prevents repeating of the image */
+    background-position: center; /* Centers the image */
+}
+
+.tree-garden {
+    height: 200px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.add-tree-button {
+    background-color: var(--color-primary); /* Set background color */
+    color: white; /* Set text color */
+    border: none; /* Remove border */
+    padding: 10px 20px; /* Add padding */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    position: absolute;
+    left: 27px;
+    bottom: 30px;
+}
+
+.add-tree-button.add-tree-button-active{
+    pointer-events: none;
+    opacity: 30%
 }
 
 .settings {
