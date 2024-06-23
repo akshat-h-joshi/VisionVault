@@ -1,9 +1,11 @@
+import os 
 from flask import request, jsonify, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from init import app,db
-from flask_migrate import Migrate
 import logging
 from datetime import datetime
+
 
 
 # Configure logging
@@ -22,6 +24,8 @@ class User(db.Model):
     frame1_type = db.Column(db.String(50))  # Example: 'Pine Tree', 'Spruce Tree', etc.
     frame2_type = db.Column(db.String(50))
     frame3_type = db.Column(db.String(50))
+    prestige_level = db.Column(db.Integer, default=0)
+    profile_image = db.Column(db.String(150), nullable=True) 
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -116,6 +120,40 @@ def home():
     except Exception as e:
         print("Error:", e)
         return "An error occurred while fetching goals"
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/upload_profile_image', methods=['POST'])
+def upload_profile_image():
+    data = request.get_json()
+    user_id = data.get('user_id')
+    user = User.query.get(user_id)
+
+    if 'profile_image' not in request.files:
+        return jsonify(success=False, message='No file part')
+    
+    file = request.files['profile_image']
+    if file.filename == '':
+        return jsonify(success=False, message='No selected file')
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        
+        if user:
+            user.profile_image = filename
+            db.session.commit()
+            return jsonify(success=True)
+        else:
+            return jsonify(success=False, message='User not found')
+    return jsonify(success=False, message='Invalid file type')
 
 @app.route('/save_goal', methods=['POST'])
 def save_goal():
@@ -422,21 +460,69 @@ def check_tree_availability(user_id, tree_type):
     except Exception as e:
         return jsonify(error=str(e)), 500
     
-@app.route('/get_tree_state/<int:user_id>', methods=['GET'])
-def get_tree_state(user_id):
+@app.route('/get_tree_types/<int:user_id>', methods=['GET'])
+def get_tree_types(user_id):
     try:
         user = User.query.get(user_id)
         if not user:
             return jsonify(success=False, message="User not found."), 404
         
-        # Construct JSON response with tree state
-        tree_state = {
-            'tree1_type': user.frame1_type,
-            'tree2_type': user.frame2_type,
-            'tree3_type': user.frame3_type
-            # Add more fields as needed for additional tree frames
+        tree_types = {
+            'frame1_type': user.frame1_type,
+            'frame2_type': user.frame2_type,
+            'frame3_type': user.frame3_type
         }
-
-        return jsonify(tree_state)
+        return jsonify(tree_types), 200
     except Exception as e:
         return jsonify(error=str(e)), 500
+
+@app.route('/update_tree_type/<int:user_id>/<int:frame_number>', methods=['POST'])
+def update_tree_type(user_id, frame_number):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify(success=False, message="User not found."), 404
+        
+        data = request.get_json()
+        tree_type = data.get('tree_type')
+        
+        if not tree_type:
+            return jsonify(success=False, message="Tree type not provided."), 400
+        
+        if frame_number == 1:
+            user.frame1_type = tree_type
+        elif frame_number == 2:
+            user.frame2_type = tree_type
+        elif frame_number == 3:
+            user.frame3_type = tree_type
+        else:
+            return jsonify(success=False, message="Invalid frame number."), 400
+        
+        db.session.commit()
+        return jsonify(success=True), 200
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
+
+@app.route('/check_frames_and_increase_prestige/<int:user_id>', methods=['POST'])
+def check_frames_and_increase_prestige(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify(success=False, message="User not found."), 404
+        
+        # Check if all frames have a tree
+        if user.frame1_type and user.frame2_type and user.frame3_type:
+            # Increase the prestige level
+            user.prestige_level += 1
+            
+            # Reset the frames
+            user.frame1_type = None
+            user.frame2_type = None
+            user.frame3_type = None
+            
+            db.session.commit()
+            return jsonify(success=True, message="Prestige level increased and frames reset."), 200
+        else:
+            return jsonify(success=False, message="Not all frames have trees."), 400
+    except Exception as e:
+        return jsonify(success=False, message=str(e)), 500
