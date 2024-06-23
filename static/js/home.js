@@ -65,26 +65,36 @@ document.addEventListener('DOMContentLoaded', function() {
         })
     })})
 
-// Script for changing profile picture
-let profilePic = document.getElementById("profile-pic");
-let inputFile = document.getElementById("input-file");
-
-inputFile.onchange = function(){
-    console.log("File input changed");
-    console.log(profilePic);
-    console.log(inputFile);
-    profilePic.src = URL.createObjectURL(inputFile.files[0]);
-    // Send a message containing the new profile picture source to the parent window
-    window.parent.postMessage({ profilePicSrc: profilePic }, '*');
-}
-
-window.addEventListener('message', function(event) {
-    // Check if the message contains a new profile picture source
-    if (event.data && event.data.profilePicSrc) {
-        let profilePicdashboard = document.getElementById("profile-pic");
-        profilePicdashboard.src = event.data.profilePicSrc;
-    }
-});
+    document.getElementById('input-file').addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('profile-pic').src = e.target.result;
+    
+                // Upload the image to the server
+                const formData = new FormData();
+                formData.append('profile_image', file);
+    
+                fetch('/upload_profile_image', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Profile image updated successfully');
+                    } else {
+                        console.error('Failed to update profile image:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+            reader.readAsDataURL(file);
+        }
+    });
 
 const Orders = [
     {
@@ -569,15 +579,14 @@ function addGoal(data, goalCategory, goalName, dueDate, priorityLevel) {
     bindCategoryClickEvents();
 }
 
-function selectTree(treeNumber) {
+function selectTree(frameNumber) {
     getUserId()
         .then(userId => {
-            const treeTypes = ['Pine Tree', 'Spruce Tree', 'Birch Tree', 'Cedar Tree']; // List of available tree types
+            const treeTypes = ['Pine Tree', 'Spruce Tree', 'Birch Tree', 'Cedar Tree'];
             const selectedTree = prompt('Please select a tree to plant:\n1. Pine Tree\n2. Spruce Tree\n3. Birch Tree\n4. Cedar Tree');
 
             console.log('Selected tree:', selectedTree);
 
-            // Validate selectedTree as a number between 1 and 4
             if (selectedTree !== null && selectedTree !== '' && !isNaN(selectedTree) && selectedTree >= 1 && selectedTree <= 4) {
                 const selectedTreeType = treeTypes[selectedTree - 1];
                 console.log('Selected tree type:', selectedTreeType);
@@ -588,17 +597,37 @@ function selectTree(treeNumber) {
                         console.log('Response data:', data);
 
                         if (data.available) {
-                            const treeFrame = document.getElementById(`tree${treeNumber}Frame`);
+                            const treeFrame = document.getElementById(`tree${frameNumber}Frame`);
                             const imageName = `${selectedTreeType.toLowerCase().replace(' ', '-')}-stage-3`;
                             console.log('Image name:', imageName);
                             treeFrame.style.backgroundImage = `url('/static/img/${imageName}.png')`;
 
                             // Hide the add-tree-button after a tree is added
-                            const addTreeButton = document.getElementById(`addTreeButton${treeNumber}`);
+                            const addTreeButton = document.getElementById(`addTreeButton${frameNumber}`);
                             if (addTreeButton) {
                                 addTreeButton.classList.add('add-tree-button-active');
                             }
-        
+
+                            checkFramesAndIncreasePrestige()
+
+                            // Update the tree type in the database
+                            fetch(`/update_tree_type/${userId}/${frameNumber}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ tree_type: selectedTreeType })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data.success) {
+                                    console.error('Failed to update tree type:', data.message);
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error updating tree type:', error);
+                            });
+
                         } else {
                             alert(`You don't have a ${selectedTreeType}.`);
                         }
@@ -607,7 +636,6 @@ function selectTree(treeNumber) {
                         console.error('Error:', error);
                     });
             } else {
-                // Handle invalid input
                 alert('Please input a valid number (1 to 4) to select a tree.');
                 console.log('Invalid selection:', selectedTree);
             }
@@ -618,41 +646,42 @@ function selectTree(treeNumber) {
         });
 }
 
-// Function to fetch tree state from the server and update tree frames
-function fetchTreeState() {
+function checkFramesAndIncreasePrestige() {
     getUserId()
         .then(userId => {
-            fetch(`/get_tree_state/${userId}`)
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Fetched tree state:', data);
-                    // Update each tree frame based on fetched data
-                    updateTreeFrame(1, data.tree1_type);
-                    updateTreeFrame(2, data.tree2_type);
-                    updateTreeFrame(3, data.tree3_type);
-                    // Update more tree frames as needed
-                })
-                .catch(error => {
-                    console.error('Error fetching tree state:', error);
-                });
+            fetch(`/check_frames_and_increase_prestige/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Prestige level increased and frames reset!');
+                    // Reset the frames in the UI
+                    for (let i = 1; i <= 3; i++) {
+                        const treeFrame = document.getElementById(`tree${i}Frame`);
+                        treeFrame.style.backgroundImage = '';
+
+                        const addTreeButton = document.getElementById(`addTreeButton${i}`);
+                        if (addTreeButton) {
+                            addTreeButton.classList.remove('add-tree-button-active');
+                        }
+                    }
+                } else {
+                    return;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
         })
         .catch(error => {
             console.error('Error fetching user ID:', error);
+            alert('Failed to fetch user ID. Please try again.');
         });
-}
-
-// Function to update a specific tree frame with type
-function updateTreeFrame(treeNumber, treeType) {
-    const treeFrame = document.getElementById(`tree${treeNumber}Frame`);
-    if (treeFrame) {
-        if (treeType) {
-            const imageName = `${treeType.toLowerCase().replace(' ', '-')}-stage-3`;
-            treeFrame.style.backgroundImage = `url('/static/img/${imageName}.png')`;
-        } else {
-            // Handle default state if no tree is planted
-            treeFrame.style.backgroundImage = 'url(/static/img/plus-blue.png)';
-        }
-    }
 }
 
                     // ADD GOAL DOM LISTENER
@@ -681,7 +710,32 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCategoryDropdown('goalCategory');
     updateCategoriesContainer();
     addAllCategory();
-    fetchTreeState();
+    getUserId()
+        .then(userId => {
+            fetch(`/get_tree_types/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    for (let i = 1; i <= 3; i++) {
+                        const treeType = data[`frame${i}_type`];
+                        if (treeType) {
+                            const treeFrame = document.getElementById(`tree${i}Frame`);
+                            const imageName = `${treeType.toLowerCase().replace(' ', '-')}-stage-3`;
+                            treeFrame.style.backgroundImage = `url('/static/img/${imageName}.png')`;
+                            const addTreeButton = document.getElementById(`addTreeButton${i}`);
+                            if (addTreeButton) {
+                                addTreeButton.classList.add('add-tree-button-active');
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching tree types:', error);
+                });
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+            alert('Failed to fetch user ID. Please try again.');
+        });
 
     // Add Category button click handler
     addCategoryButton.addEventListener("click", () => {
