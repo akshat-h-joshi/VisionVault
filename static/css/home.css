@@ -8,7 +8,9 @@
     --color-warning: #F7D060;
     --color-white: #fff;
     --color-info-dark: #7d8da1;
+    --color-light-grey: rgb(201, 201, 201);
     --color-dark: #363949;
+    --color-dark-border: rgba(54, 57, 73, 0.5);
     --color-light: rgba(132, 139, 200, 0.18);
     --color-dark-variant: #677483;
     --color-background: #f6f6f9;
@@ -23,15 +25,18 @@
     --box-shadow: 0 2rem 3rem var(--color-light);
 }
 
+/* Changing colour definitions for when user switches to dark mode */
 .dark-mode-variables{
     --color-background: #181a1e;
     --color-white: #202528;
     --color-dark: #edeffd;
+    --color-dark-border: rgb(237, 239, 253);
     --color-dark-variant: #a3bdcc;
     --color-light: rgba(0, 0, 0, 0.4);
     --box-shadow: 0 2rem 3rem var(--color-light);
 }
 
+/* Foundation */
 *{
     margin: 0;
     padding: 0;
@@ -46,6 +51,7 @@ html{
     font-size: 14px;
 }
 
+/* Main Body */
 body{
     width: 100vw;
     height: 100vh;
@@ -57,63 +63,56 @@ body{
     background-color: var(--color-background);
 }
 
+/* Universal a tag styling */
 a{
     color: var(--color-dark);
 }
 
+/* Universal img styling */
 img{
     display: block;
     width: 100%;
     object-fit: cover;
 }
 
+/* Universal h1 styling */
 h1{
     font-weight: 800;
     font-size: 1.8rem;
 }
 
+/* Universal h2 styling */
 h2{
     font-weight: 600;
     font-size: 1.4rem;
 }
 
+/* Universal h3 styling */
 h3{
     font-weight: 500;
     font-size: 0.87rem;
 }
 
+/* Universal small styling */
 small{
     font-size: 0.76rem;
 }
 
+/* Universal p tag styling */
 p{
     color: var(--color-dark-variant);
 }
 
+/* Universal b tag styling */
 b{
     color: var(--color-dark);
-}
-
-.text-muted{
-    color: var(--color-info-dark);
-}
-
-.primary{
-    color: var(--color-primary);
 }
 
 .danger{
     color: var(--color-danger);
 }
 
-.success{
-    color: var(--color-success);
-}
-
-.warning{
-    color: var(--color-warning);
-}
-
+/* Main container */
 .container{
     display: grid;
     width: 96%;
@@ -122,33 +121,38 @@ b{
     grid-template-columns: 12rem auto 23rem;
 }
 
+/* Tag through which sidebar is established */
 aside{
     height: 100vh;
 }
 
-aside .toggle{
+/* Flex list for sidebar elements */
+aside .list{
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-top: 1.4rem;
 }
 
-aside .toggle .logo{
+/* Company Name  */
+aside .list .logo{
     display: flex;
     gap: 0.5rem;
 }
 
-aside .toggle .logo .icon {
+/* Company Tree Icon */
+aside .list .logo .icon {
     width: 2rem;
     height: 2rem;
     font-size: 2rem;
 }
 
-aside .toggle .close{
+aside .list .close{
     padding-right: 1rem;
     display: none;
 }
 
+/* Sidebar */
 aside .sidebar{
     display: flex;
     flex-direction: column;
@@ -161,10 +165,12 @@ aside .sidebar{
     transition: all 0.3s ease;
 }
 
+/* Hover Sidebar No box shadow */
 aside .sidebar:hover{
     box-shadow: none;
 }
 
+/* Styling for sidebar a tags like page names */
 aside .sidebar a{
     display: flex;
     align-items: center;
@@ -176,17 +182,20 @@ aside .sidebar a{
     transition: all 0.3s ease;
 }
 
+/* Styling for sidebar page icons */
 aside .sidebar a span{
     font-size: 1.6rem;
     transition: all 0.3s ease;
 }
 
+/* Styling to position logout button near the bottom */
 aside .sidebar a:last-child{
     position: absolute;
     bottom: 2rem;
     width: 100%;
 }
 
+/* Change color of text when sidebar button is active */
 aside .sidebar a.active{
     width: 100%;
     color: var(--color-primary);
@@ -194,6 +203,7 @@ aside .sidebar a.active{
     margin-left: 0;
 }
 
+/* Add grey background when sidebar button is active */
 aside .sidebar a.active::before{
     content: '';
     width: 6px;
@@ -201,19 +211,23 @@ aside .sidebar a.active::before{
     background-color: var(--color-primary);
 }
 
+/* Move text slightly when sidebar button is active */
 aside .sidebar a.active span{
     color: var(--color-primary);
     margin-left: calc(1rem - 3px);
 }
 
+/* Change colour when hovered */
 aside .sidebar a:hover{
     color: var(--color-primary);
 }
 
+/* Move slightly when hovered */
 aside .sidebar a:hover span{
     margin-left: 0.6rem;
 }
 
+/* Styling common for all sidebar buttons */
 .sidebar .sidebar-button{
     display: flex;
     align-items: center;
@@ -224,21 +238,122 @@ aside .sidebar a:hover span{
     font-size: inherit;
 }
 
+/* Custom alert and prompt modal */
+.modal-custom {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto;
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Custom modal content, consisting of white box in the middle */
+.modal-content-custom {
+    background-color: var(--color-white);
+    margin: 17% auto; /* 17% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 30%; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 0.5s;
+    position: relative;
+}
+
+/* Marign specific to alert modal content */
+#customAlertContent {
+    margin: 19% auto;
+}
+
+/* Colouring for p tag and input */
+.modal-content-custom p,
+.modal-content-custom input{
+    color: var(--color-dark);
+}
+
+/* Close button for custom modal */
+.close-btn-custom {
+    color: #aaa;
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* Hover effect for close button */
+.close-btn-custom:hover,
+.close-btn-custom:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Set height of each prompt modal */
+#modalContentPrompt1,
+#modalContentPrompt2,
+#modalContentPrompt3,
+#modalContentPrompt4 {
+    height: 20%;
+}
+
+/* Increased width for category deletion modal */
+#modalContentPrompt3 {
+    width: 40%
+}
+
+/* Submit button for prompt modals */
+.submit-button-prompt {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px; 
+    cursor: pointer;
+    font-size: 16px;
+    position: absolute;
+    left: 15px;
+    bottom: 10px;
+}
+
+/* Hover effect for submit-button */
+.modal-content-custom .submit-button-prompt:hover {
+    background-color: #45a049;
+}
+
+/* Margin for input field in prompt modal */
+.promptInput-custom {
+    margin-top: 10px;
+    color: var(--color-dark);
+    background-color: var(--color-white);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+/* common styling for all pages */
 .page {
     background: none;
 }
 
+/* Other categories are hidden when one is clicked */
 .page.hidden {
     display: none;
 }
 
-.form-hidden{
-    display: none;    
-}
+/* dashboard class */
 .dashboard {
     border: none;
 }
 
+/* profile class, flex display to fit containers side by side */
 .profile {
     display: flex;
     flex-wrap: wrap; /* Allow wrapping if containers are too wide */
@@ -252,6 +367,7 @@ aside .sidebar a:hover span{
     /* border: 2px solid black; */
 }
 
+/* container where profile image is shown and updated */
 .profile .profile-container {
     background-color: var(--color-white);
     margin-top: 50px;
@@ -265,9 +381,9 @@ aside .sidebar a:hover span{
     box-shadow: var(--box-shadow);
     transition: box-shadow 0.3s ease;
     flex: 1; /* Allow flexibility but ensure they fit side by side */
-    /* border: 2px solid red; */
 }
 
+/* container where user information and statistics are shown, as well as graphical analysis */
 .profile .info-container {
     background-color: var(--color-white);
     margin-top: 50px;
@@ -279,22 +395,96 @@ aside .sidebar a:hover span{
     box-shadow: var(--box-shadow);
     transition: box-shadow 0.3s ease;
     flex: 1; /* Allow flexibility but ensure they fit side by side */
-    /* border: 2px solid red; */
+    position: relative;
 }
 
+/* Hover effect */
 .profile .profile-container:hover, .profile .info-container:hover {
     box-shadow: none;
 }
 
-.profile .profile-container h1 {
+/* Titles for both containers */
+.profile .info-container h1,
+.profile .profile-container h1{
     margin: 0;
     font-weight: 600;
     font-size: 1.8rem;
     text-align: center;
     padding: 20px 0;
-    /* border: 2px solid green; */
 }
 
+.profile .info-container h1{
+    font-weight: bold;
+}
+
+/* Styling for information labels */
+.info-container p {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1.5;
+    color: var(--color-dark);
+    margin: 10px 0;
+    margin-left: 70px;
+}
+
+/*  Styling for information */
+.info-container p span {
+    font-weight: normal;
+    color: var(--color-dark);
+}
+
+/* Special styling for prestige level */
+.info-container p.prestige-level {
+    font-size: 22px; /* Adjust font size as needed */
+    font-weight: bold; /* Make the text bold */
+    margin-top: 30px;
+}
+
+/* graphical analysis container */
+.graphical-analysis{
+    background-color: var(--color-white);
+    margin-left: 70px;
+    margin-top: 30px;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.7rem;
+    padding: 1.4rem var(--card-padding);
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--box-shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.graphical-analysis:hover{
+    box-shadow: none;
+}
+
+/* graphical analysis button */
+.make-graph-button{
+    background-color: var(--color-white);
+    border: 2px dashed var(--color-primary);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* hover effect for button */
+.make-graph-button:hover{
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.make-graph-button div{
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Update image label */
 .profile-container label{
     display: block;
     width: 200px;
@@ -307,23 +497,42 @@ aside .sidebar a:hover span{
     cursor: pointer;
 }
 
+/* Hide default input asking for file */
 .profile-container input{
     display: none;
 }
 
+/* Profile image styling */
 .profile-container img {
     height: 250px;
     width: 250px;
     border-radius: 50%;
     margin: 30px auto 50px;
     display: block;
-    /* border: 2px solid brown; */
 }
+
+/* Styling for encrypted password */
+.password-container input{
+    color: var(--color-dark);
+    background-color: var(--color-white);
+    font-size: 18px;
+    line-height: 1.5;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Styling for eye icon */
+.ri-eye-line,
+.ri-eye-off-line {
+    background-color: transparent;
+    color: var(--color-dark);
+}
+
 
 .goals {
     border: none;
 }
 
+/* Container where goals information is stored */
 .goals .goals-main-container{
     display: flex;
     flex-direction: column;
@@ -340,15 +549,17 @@ aside .sidebar a:hover span{
     position: relative;
 }
 
+/* Category TItle */
 .goals .goals-main-container .title-container{
     font-weight: 600;
     margin-left: 33px;
     font-size: 1.8rem;
     width: 160px;
-    border-right: 2px solid black;
+    border-right: 2px solid var(--color-dark);
     padding-right: 10px;
 }
 
+/* Container where categories are stored in row */
 .goals .goals-categories-container{
     position: absolute;
     width: 600px;
@@ -357,39 +568,46 @@ aside .sidebar a:hover span{
     display: flex;
     flex-direction: row;
     white-space: nowrap;
-    overflow-x: auto;
+    overflow-x: auto; /*Make container scrollable */
 
 }
-/* Hide scrollbar for webkit browsers (Chrome, Safari) */
-.goals .goals-categories-container::-webkit-scrollbar {
-    width: 0; /* Set width to 0 */
-    height: 0; /* Set height to 0 */
+
+.goals-categories-container::-webkit-scrollbar {
+    height:1px; /* Adjust the height of the scrollbar */
 }
 
-.goals .goals-categories-container::-webkit-scrollbar-track {
-    background: transparent; /* Make scrollbar track transparent */
+.goals-categories-container::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
 }
 
-.goals .goals-categories-container::-webkit-scrollbar-thumb {
-    background: transparent; /* Make scrollbar thumb transparent */
+.goals-categories-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
 }
 
+.goals-categories-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
+
+/* Styling for each individual category */
 .category{
-    padding: 10px; /* Adjust padding as needed */
+    padding: 10px; 
     margin-right: 10px; /* Spacing between categories */
     cursor: pointer; /* Change cursor to pointer */
     font-size: 1.2rem;
-    /* Add other styling as needed */
 }
 
+/* Bold text when category is selected */
 .category.category-active{
     font-weight: bold;
 }
 
+/* Sub container within main container to hold buttons and table-container */
 .goals .goals-sub-container{
     flex: 1;
     background-color: none;
-    border: 0.5px solid rgba(0, 0, 0, 0.5);
+    border: 0.5px solid var(--color-dark-border);
     margin-top: 20px;
     margin-left: 35px;
     width: 850px;
@@ -398,6 +616,7 @@ aside .sidebar a:hover span{
     position: relative;
 }
 
+/* Container to hold goals table */
 .goals-sub-container .table-container{
     background-color: none;
     width: 800px;
@@ -409,12 +628,15 @@ aside .sidebar a:hover span{
     overflow-y:auto;
 }
 
+/* Name cell that is made scrollable in case of long goal names */
 .goal-name-cell {
     overflow-x: auto;
     max-width: 100px;
 }
 
+/* Delete goal button for each goal */
 .delete-goal-button{
+    background-color: transparent;
     background-image: url('/static/img/delete-icon.png');
     background-size: cover; /* Ensures the image covers the entire element */
     background-repeat: no-repeat; /* Prevents repeating of the image */
@@ -424,7 +646,9 @@ aside .sidebar a:hover span{
     cursor: pointer;
 }
 
+/* Edit goal button for each goal */
 .edit-goal-button{
+    background-color: transparent;
     background-image: url('/static/img/edit-icon.png');
     background-size: cover; /* Ensures the image covers the entire element */
     background-repeat: no-repeat; /* Prevents repeating of the image */
@@ -436,7 +660,7 @@ aside .sidebar a:hover span{
 }
 
 .table-container::-webkit-scrollbar {
-    width:3px; /* Adjust the height of the scrollbar */
+    width:3px; 
 }
 
 .table-container::-webkit-scrollbar-thumb {
@@ -457,21 +681,23 @@ aside .sidebar a:hover span{
     margin-bottom: 0.8rem;
 }
 
+/* Goals table styling */
 .goals .goals-sub-container table{
     background-color: var(--color-white);
     width: 100%;
-    /* padding: var(--card-padding); */
     text-align: center;
     border-radius: var(--card-border-radius);
     transition: all 0.3s ease;
 }
 
+/* Styling for each table row  */
 .goals .goals-sub-container table tbody td{
     height: 2.8rem;
     border-bottom: 1px solid var(--color-light);
     color: var(--color-dark-variant);
 }
 
+/* Give last cell no border */
 .goals .goals-sub-container table tbody tr:last-child td{
     border: none;
 }
@@ -483,6 +709,7 @@ aside .sidebar a:hover span{
     color: var(--color-primary);
 }
 
+/* Add goal button styling */
 .goals .goals-sub-container .goal-button{
     background-color: var(--color-primary); /* Set background color */
     color: white; /* Set text color */
@@ -495,6 +722,7 @@ aside .sidebar a:hover span{
     bottom: 20px;
 }
 
+/* Add category button styling  */
 .goals .goals-sub-container .add-category-button{
     background-color: var(--color-primary); /* Set background color */
     color: white; /* Set text color */
@@ -507,15 +735,17 @@ aside .sidebar a:hover span{
     bottom: 20px;
 }
 
+/* Delete category button styling */
 .delete-category-button {
     background-color: var(--color-white);
     color: red;
     border: none;
     padding: 5px;
-    margin-left: 5px; /* Adjust margin as needed */
+    margin-left: 5px;
     cursor: pointer;
 }
 
+/* Add goal and edit goal modal */
 .modal {
     display: none; /* Hidden by default */
     position: fixed; 
@@ -528,6 +758,7 @@ aside .sidebar a:hover span{
     background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
 }
 
+/* Modal content (white box) */
 .modal-content {
     position: relative;
     background-color: var(--color-background);
@@ -545,13 +776,15 @@ aside .sidebar a:hover span{
     box-sizing: border-box;
 }
 
+/* Heading for modals */
 .modal-content h2{
     position: absolute;
-    left: 430px;
+    left: 40%;
     top: 20px;
     font-size: 1.6rem;
 }
 
+/* Main info container on the right hand side where goals details are inputted */
 .modal-content .sub-tasks-container, .modal-content .main-info-container {
     background-color: var(--color-white);
     margin: 20px; 
@@ -563,6 +796,7 @@ aside .sidebar a:hover span{
     overflow-y: auto;
 }
 
+/* Tree container on left hand side where tree is selected/grown */
 .modal-content .tree-container {
     background-color: var(--color-white);
     margin: 20px; 
@@ -576,6 +810,7 @@ aside .sidebar a:hover span{
     position: relative;
 }
 
+/* Arrow for swapping through trees */
 .arrow {
     position: absolute;
     background-color: #4CAF50;
@@ -587,20 +822,24 @@ aside .sidebar a:hover span{
     margin: 0 10px;
 }
 
+/* previous arrow position */
 #prev {
     left: 10px;
     z-index: 1;
 }
 
+/* next arrow position */
 #next {
     right: 10px;
     z-index: 1;
 }
 
+/* arrow hover effect */
 .arrow:hover {
     background-color: #45a049;
 }
 
+/* Container for name and image of tree */
 .tree-info {
     text-align: center;
     margin-left: 75px;
@@ -610,37 +849,25 @@ aside .sidebar a:hover span{
     width: 300px;
 }
 
+/* Styling for tree image */
 #tree-image, #tree-image-edit {
     width: 200px;
     height: 200px;
-    object-fit: contain;
+    object-fit: contain; /* Ensure image fits within container */
     display: block;
 }
 
-.pine-tree {
-    position: absolute;
-    right: 15%;
-    bottom: 25%;
-}
-
-.birch-tree {
-    position: absolute;
-    right: 15%;
-    bottom: 25%;
-}
-
-.spruce-tree {
-    position: absolute;
-    right: 15%;
-    bottom: 25%;
-}
-
+/* Positioning of each tree */
+.pine-tree,
+.birch-tree,
+.spruce-tree,
 .cedar-tree {
     position: absolute;
     right: 15%;
     bottom: 25%;
 }
 
+/* Different positioning for tree seed */
 #tree-image-edit.tree-seed {
     position: absolute;
     right: 40%;
@@ -649,16 +876,19 @@ aside .sidebar a:hover span{
     width: 100px;
 }
 
+/* Keyframes for tree grow animation */
 @keyframes tree-grow {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }
 }
 
+/* Tree grow animation */
 .tree-grow {
     animation: tree-grow 1s ease-in-out;
 }
 
+/* Styling for tree name and positioning */
 #tree-name, #tree-name-edit {
     font-size: 1.2em;
     font-weight: bold;
@@ -669,6 +899,7 @@ aside .sidebar a:hover span{
     transform: translateX(-50%);
 }
 
+/* Container where tasks are held */
 .modal-content .sub-tasks-container {
     width: 400px;
     position: absolute;
@@ -676,6 +907,7 @@ aside .sidebar a:hover span{
     opacity: 0;
 }
 
+/* Class to wrap different elements together */
 .modal-content .sub-tasks-container .content-wrapper {
     display: flex;
     align-items: flex-start;
@@ -684,19 +916,21 @@ aside .sidebar a:hover span{
 
 /* vertical line in sub-tasks-container */
 .content-wrapper .vertical-line{
-    border-left: 1px solid black; 
+    border-left: 1px solid var(--color-dark); 
     margin-left: 30px;
     height: 100%; 
     z-index: 0;
 }
 
+/* Container for each individual task */
 .content-wrapper .task-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-left: -35px; /* Adjust the margin to align tasks with the vertical line */
+    margin-left: -35px; 
 }
 
+/* Task content consisting of task elements */
 .task-container .task-content {
     width: 20px;
     height: 20px;
@@ -706,6 +940,7 @@ aside .sidebar a:hover span{
     z-index: 0;
 }
 
+/* Clickable diamond to show/hide task field */
 .task-content .clickable-area {
     background-image: url('/static/img/task-empty.png');
     background-size: cover; /* Ensures the image covers the entire element */
@@ -717,10 +952,12 @@ aside .sidebar a:hover span{
     z-index: 1;
 }
 
+/* hover effect for clickable area */
 .clickable-area:hover{
     background-image: url('/static/img/task-full.png');
 }
 
+/* Add task button styling */
 .task-container .add-task-button {
     display: block;
     margin-left: 24px;
@@ -728,8 +965,10 @@ aside .sidebar a:hover span{
     z-index: 1;
     cursor: pointer;
     background: var(--color-white);
+    color: var(--color-dark);
 }
 
+/* End line at the end of task container line when accessing edit goal modal to replace add task button */
 .task-container .end-line {
     display: block;
     margin-left: 22px;
@@ -737,9 +976,11 @@ aside .sidebar a:hover span{
     z-index: 1;
     cursor: pointer;
     background: var(--color-white);
-    border-top: 1px solid black;
+    color: var(--color-dark);
+    border-top: 1px solid var(--color-dark);
 }
 
+/* Task input field for journalling or progress tracking for each task  */
 .task-content .task-text {
     position: absolute;
     top: 40px;
@@ -748,14 +989,14 @@ aside .sidebar a:hover span{
     font-size: 12px;
     padding: 5px;
     height: 50px;
-    color: black;
+    color: var(--color-dark);
     border: 0.2px solid #ccc;
     border-radius: 5px;
-    /* margin-left: 50px; */
     cursor: pointer;
     overflow-y: auto;
 }
 
+/* Task title */
 .task-content .task-label {
     position: absolute;
     left: 75px;
@@ -764,13 +1005,14 @@ aside .sidebar a:hover span{
     width: 150px;
     font-size: 24px;
     font-weight: bold;
-    color: black;
+    color: var(--color-dark);
     /* margin-left: 50px; */
     cursor: pointer;
     overflow-x: auto;
     white-space: nowrap; /* Prevent the text from wrapping */
 }
 
+/* Delete task button styling */
 .task-content .delete-task-button {
     position: absolute;
     left: 270px;
@@ -784,6 +1026,7 @@ aside .sidebar a:hover span{
     cursor: pointer;
 }
 
+/* Hover effect for delete task button */
 .delete-task-button:hover{
     top: 7.5px;
     left: 267.5px;
@@ -791,6 +1034,7 @@ aside .sidebar a:hover span{
     width: 25px;
 }
 
+/* Complete task button for edit goal modal */
 .task-content .complete-task-button {
     position: absolute;
     left: 270px;
@@ -804,10 +1048,12 @@ aside .sidebar a:hover span{
     cursor: pointer;
 }
 
+/* Reduced opacity when task is completed */
 .completed {
     opacity: 10%;
 }
 
+/* Complete task button hover enlargement effect */
 .complete-task-button:hover{
     top: 7.5px;
     left: 267.5px;
@@ -833,7 +1079,6 @@ aside .sidebar a:hover span{
     border-radius: 4px; /* Rounded corners for the scrollbar track */
 }
 
-
 /* Custom scrollbar styles */
 .task-content .task-label::-webkit-scrollbar {
     height: 2px; /* Adjust the height of the scrollbar */
@@ -853,6 +1098,7 @@ aside .sidebar a:hover span{
     border-radius: 4px; /* Rounded corners for the scrollbar track */
 }
 
+/* Reveal of sub tasks container when continue button is clicked */
 .modal-content.modal-active .sub-tasks-container {
     margin-left: 2%; /* Move into view */
     opacity: 1; /* Visible */
@@ -862,6 +1108,7 @@ aside .sidebar a:hover span{
     flex-direction: column;
 }
 
+/* Show main info container when modal content when continue button hasn't been clicked  */
 .modal-content .main-info-container {
     width: 400px;
     padding-left: 50px;
@@ -869,6 +1116,7 @@ aside .sidebar a:hover span{
     display: block;
 }
 
+/* Move main info away and reduce its opacity with a transition when continue button is clicked */
 .modal-content.modal-active .main-info-container{
     position: absolute;
     right: 200%;
@@ -876,7 +1124,7 @@ aside .sidebar a:hover span{
     transition: opacity 0.05s ease;
 }
 
-
+/* back button and finalise button styling */
 .modal-content .back-button,
 .modal-content .finalise-button {
     display: none;
@@ -889,6 +1137,7 @@ aside .sidebar a:hover span{
     position: absolute;
 }
 
+/* continue button styling */
 .modal-content .continue-button{
     background-color: var(--color-primary); /* Set background color */
     color: white; /* Set text color */
@@ -914,27 +1163,50 @@ aside .sidebar a:hover span{
 
 .modal-content.modal-active .finalise-button {
     right: 70px;
-    bottom: 30px; /* Ensure it's positioned correctly */
+    bottom: 30px; 
 }
 
 .modal-content.modal-active .continue-button {
     display: none;
 }
 
-/* Hide scrollbar for webkit browsers (Chrome, Safari) */
-.modal-content .main-info-container::-webkit-scrollbar {
-    width: 0; /* Set width to 0 */
-    height: 0; /* Set height to 0 */
+.main-info-container::-webkit-scrollbar {
+    width:1px; 
 }
 
-.modal-content .main-info-container::-webkit-scrollbar-track {
-    background: transparent; /* Make scrollbar track transparent */
+.main-info-container::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
 }
 
-.modal-content .main-info-container::-webkit-scrollbar-thumb {
-    background: transparent; /* Make scrollbar thumb transparent */
+.main-info-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
 }
 
+.main-info-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
+
+.sub-tasks-container::-webkit-scrollbar {
+    width:1px; /* Adjust the height of the scrollbar */
+}
+
+.sub-tasks-container::-webkit-scrollbar-thumb {
+    background: #888; /* Color of the scrollbar thumb */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+}
+
+.sub-tasks-container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Color of the scrollbar thumb on hover */
+}
+
+.sub-tasks-container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Color of the scrollbar track */
+    border-radius: 4px; /* Rounded corners for the scrollbar track */
+}
+
+/* error message when all input fields aren't full in modals */
 .modal-content .error-message {
     position: absolute;
     font-size: 18px;
@@ -943,17 +1215,20 @@ aside .sidebar a:hover span{
     bottom: 30px;
  }
 
+ /* form for goal information */
 .main-info-container form {
     display: flex;
     flex-direction: column;
 }
 
+/* Labels for goals form input fields */
 .main-info-container label {
     margin-bottom: 5px;
     display: block;
     font-weight: bold;
 }
 
+/* Styling for input fields */
 .main-info-container input[type="text"],
 .main-info-container input[type="date"],
 .main-info-container select,
@@ -963,17 +1238,81 @@ aside .sidebar a:hover span{
     border: 1px solid #ccc;
     border-radius: 5px;
     font-family: 'Arial', sans-serif;
+    background-color: var(--color-white);
+    color: var(--color-dark)
 }
 
 .main-info-container input[type="date"]{
     caret-color: none; /* Prevent typing within the date field */
 }
 
-#dueDate::-webkit-calendar-picker-indicator {
-    background-color: white;
-    border-radius: 4px;
-    padding: 5px;
+                        /* Custom calendar */
+.flatpickr-calendar {
+    background-color: var(--color-white); /* Custom background color */
+    color: var(--color-dark);
+    border: 1px solid var(--color-white); /* Custom border */
 }
+
+.flatpickr-day.selected {
+    background-color: var(--color-white); /* Custom selected day color */
+    color: var(--color-dark); /* Custom selected day text color */
+}
+
+.flatpickr-day.today {
+    border-color: var(--color-dark); /* Custom today day border color */
+    color: var(--color-dark); /* Custom today day text color */
+}
+
+.flatpickr-day {
+    color: var(--color-dark);
+}
+
+.flatpickr-day.nextMonthDay,
+.flatpickr-day.prevMonthDay {
+    color: var(--color-info-dark);
+}
+
+.flatpickr-day.prevMonthDay.flatpickr-disabled{
+    color: var(--color-light-grey);
+}
+
+.flatpickr-day.flatpickr-disabled {
+    color: var(--color-light-grey);
+}
+
+.flatpickr-months {
+    color: var(--color-dark);
+}
+
+.flatpickr-months .flatpickr-month {
+    color: var(--color-dark);
+}
+
+.flatpickr-weekdays {
+    color: var(--color-dark);
+}
+
+.flatpickr-weekdays .flatpickr-weekday {
+    color: var(--color-dark);
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    color: var(--color-dark);
+    background-color: var(--color-white);
+}
+
+/* Dropdown button hover */
+.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
+    color: var(--color-dark);
+    background-color: var(--color-white);
+}
+
+/* Dropdown options hover */
+.flatpickr-monthDropdown-months .flatpickr-monthDropdown-months:hover {
+    color: var(--color-dark);
+    background-color: var(--color-white);
+}
+
 .main-info-container input[type="text"]:focus,
 .main-info-container input[type="date"]:focus,
 .main-info-container select:focus,
@@ -997,6 +1336,7 @@ aside .sidebar a:hover span{
     box-shadow: none;
 }
 
+/* close button for modals */
 .close-button {
     color: #aaa;
     position: absolute;
@@ -1006,6 +1346,7 @@ aside .sidebar a:hover span{
     font-weight: bold;
 }
 
+/* close button hover effect */
 .close-button:hover,
 .close-button:focus {
     color: black;
@@ -1013,7 +1354,7 @@ aside .sidebar a:hover span{
     cursor: pointer;
 }
 
-/* Blur Effect */
+/* Blur Effect when modal is active */
 .blurred {
     filter: blur(5px);
 }
@@ -1026,6 +1367,7 @@ aside .sidebar a:hover span{
     border: none;
 }
 
+/* garden main container  */
 .garden .garden-main-container{
     background-color: var(--color-white);
     margin-top: 10px;
@@ -1040,7 +1382,7 @@ aside .sidebar a:hover span{
     position: relative;
 }
 
-/* Light mode style */
+/* Light mode style for garden background */
 .garden .garden-background-container{
     margin-left: 65px;
     margin-top: 20px;
@@ -1058,11 +1400,12 @@ aside .sidebar a:hover span{
     position: relative;
 }
 
-/* Dark mode style */
+/* Dark mode style for garden background*/
 .dark-mode-variables .garden .garden-background-container {
     background-image: url('/static/img/garden-background-dark.png'); 
 }
 
+/* container for each individual tree */
 .garden-tree-container {
     align-items: center;
     margin-right: 50px;
@@ -1072,6 +1415,7 @@ aside .sidebar a:hover span{
     margin-top: 50px;
 }
 
+/* tree frame storing tree image */
 .tree-frame {
     width: 150px;
     height: 200px;
@@ -1084,12 +1428,7 @@ aside .sidebar a:hover span{
     background-position: center; /* Centers the image */
 }
 
-.tree-garden {
-    height: 200px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-}
-
+/* add tree button */
 .add-tree-button {
     background-color: var(--color-primary); /* Set background color */
     color: white; /* Set text color */
@@ -1102,13 +1441,10 @@ aside .sidebar a:hover span{
     bottom: 30px;
 }
 
+/* when tree is added, fade out and disallow further interaction */
 .add-tree-button.add-tree-button-active{
     pointer-events: none;
     opacity: 30%
-}
-
-.settings {
-    border: none;
 }
 
 main{
@@ -1146,99 +1482,34 @@ main .analyse h3{
     font-size: 1rem;
 }
 
-main .analyse .progress{
-    position: relative;
-    width: 92px;
-    height: 92px;
-    border-radius: 50%;
+/* total goals count */
+.analyse .total-goals-container {
+    background-color: #4CAF50; /* Softer green */
+    color: white;
 }
 
-main .analyse svg{
-    width: 7rem;
-    height: 7rem;
+/* completed goals count */
+.analyse .completed-goals-container {
+    background-color: #F44336;
+    color: white;
 }
 
-main .analyse svg circle{
-    fill: none;
-    stroke-width: 10;
-    stroke-linecap: round;
-    transform: translate(5px, 5px);
+/* goals in progress count */
+.analyse .goals-in-progress-container {
+    background-color: #2196F3;
+    color: white;
 }
 
-main .analyse .sales svg circle{
-    stroke: var(--color-success);
-    stroke-dashoffset: -30;
-    stroke-dasharray: 200;
-}
-
-main .analyse .visits svg circle{
-    stroke: var(--color-danger);
-    stroke-dashoffset: -30;
-    stroke-dasharray: 200;
-}
-
-main .analyse .searches svg circle{
-    stroke: var(--color-primary);
-    stroke-dashoffset: -30;
-    stroke-dasharray: 200;
-}
-
-main .analyse .progress .percentage{
-    position: absolute;
-    top: -3px;
-    left: -1px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    width: 100%;
-}
-
-main .new-users{
+main .upcoming-goals{
     margin-top: 1.3rem;
 }
 
-main .new-users .user-list{
-    background-color: var(--color-white);
-    padding: var(--card-padding);
-    border-radius: var(--card-border-radius);
-    margin-top: 1rem;
-    box-shadow: var(--box-shadow);
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 1.4rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-main .new-users .user-list:hover{
-    box-shadow: none;
-}
-
-main .new-users .user-list .user{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-main .new-users .user-list .user img{
-    width: 5rem;
-    height: 5rem;
-    margin-bottom: 0.4rem;
-    border-radius: 50%;
-}
-
-main .recent-orders{
-    margin-top: 1.3rem;
-}
-
-main .recent-orders h2{
+main .upcoming-goals h2{
     margin-bottom: 0.8rem;
 }
 
-main .recent-orders table{
+/* table consisting of upcoming goals */
+main .upcoming-goals table{
     background-color: var(--color-white);
     width: 100%;
     padding: var(--card-padding);
@@ -1248,7 +1519,7 @@ main .recent-orders table{
     transition: all 0.3s ease;
 }
 
-main .recent-orders table:hover{
+main .upcoming-goals table:hover{
     box-shadow: none;
 }
 
@@ -1262,13 +1533,14 @@ main table tbody tr:last-child td{
     border: none;
 }
 
-main .recent-orders a{
+main .upcoming-goals a{
     text-align: center;
     display: block;
     margin: 1rem auto;
     color: var(--color-primary);
 }
 
+/* right section consisting of profie image and dark/light mode switch */
 .right-section{
     margin-top: 1.4rem;
 }
@@ -1309,6 +1581,7 @@ main .recent-orders a{
     border-radius: var(--border-radius-1);
 }
 
+/* profile image container on right section dashboard */
 .right-section .user-profile{
     display: flex;
     justify-content: center;
@@ -1326,9 +1599,10 @@ main .recent-orders a{
     box-shadow: none;
 }
 
+/* profile image */
 .right-section .user-profile img{
     width: 11rem;
-    height: auto;
+    height: 11rem;
     margin-bottom: 0.8rem;
     border-radius: 50%;
 }
@@ -1337,82 +1611,7 @@ main .recent-orders a{
     margin-bottom: 0.2rem;
 }
 
-.right-section .reminders{
-    margin-top: 2rem;
-}
-
-.right-section .reminders .header{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 0.8rem;
-}
-
-.right-section .reminders .header span{
-    padding: 10px;
-    box-shadow: var(--box-shadow);
-    background-color: var(--color-white);
-    border-radius: 50%;
-}
-
-.right-section .reminders .notification{
-    background-color: var(--color-white);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.7rem;
-    padding: 1.4rem var(--card-padding);
-    border-radius: var(--border-radius-2);
-    box-shadow: var(--box-shadow);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.right-section .reminders .notification:hover{
-    box-shadow: none;
-}
-
-.right-section .reminders .notification .content{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0;
-    width: 100%;
-}
-
-.right-section .reminders .notification .icon{
-    padding: 0.6rem;
-    color: var(--color-white);
-    background-color: var(--color-success);
-    border-radius: 20%;
-    display: flex;
-}
-
-.right-section .reminders .notification.deactive .icon{
-    background-color: var(--color-danger);
-}
-
-.right-section .reminders .add-reminder{
-    background-color: var(--color-white);
-    border: 2px dashed var(--color-primary);
-    color: var(--color-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-.right-section .reminders .add-reminder:hover{
-    background-color: var(--color-primary);
-    color: white;
-}
-
-.right-section .reminders .add-reminder div{
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-}
-
+/* Minimal styling for larger screen sizes */
 @media screen and (max-width: 1200px) {
     .container{
         width: 95%;
@@ -1445,7 +1644,7 @@ main .recent-orders a{
         flex-basis: 40%;
     }
 
-    main .recent-orders {
+    main .upcoming-goals {
         width: 94%;
         position: absolute;
         left: 50%;
@@ -1453,7 +1652,7 @@ main .recent-orders a{
         margin: 2rem 0 0 0.8rem;
     }
 
-    main .recent-orders table{
+    main .upcoming-goals table{
         width: 83vw;
     }
 
@@ -1516,7 +1715,7 @@ main .recent-orders a{
         bottom: 5rem;
     }
 
-    aside .toggle .close{
+    aside .list .close{
         display: inline-block;
         cursor: pointer;
     }
@@ -1530,13 +1729,13 @@ main .recent-orders a{
         flex-basis: 35%;
     }
 
-    main .recent-orders{
+    main .upcoming-goals{
         position: relative;
         margin: 3rem 0 0 0;
         width: 100%;
     }
 
-    main .recent-orders table{
+    main .upcoming-goals table{
         width: 100%;
         margin: 0;
     }
