@@ -1,38 +1,49 @@
 //   ---   CHANGING BETWEEN REGISTRATION AND LOGIN   ---   //
 
-
 const container = document.querySelector(".container"),
-   pwShowHide = document.querySelectorAll(".showHidePw"),
-   pwFields = document.querySelectorAll(".password"),
-   signUp = document.querySelector(".signup-link"),
-   login = document.querySelector(".login-link");
+signUp = document.querySelector(".signup-link"),
+login = document.querySelector(".login-link");
+
+document.addEventListener('DOMContentLoaded', () => {
+    const pwShowHide = document.querySelectorAll('.showHidePw');
+
+    // Toggles each password field when eye is clicked
+    pwShowHide.forEach(eyeIcon => {
+        eyeIcon.addEventListener('click', () => {
+            console.log('Eye icon clicked');
+
+            let pwField;
+            const targetId = eyeIcon.getAttribute('data-target');
+
+            if (targetId === 'password-signup') {
+                pwField = document.getElementById('password-signup');
+            } else if (targetId === 'confirm-password-signup') {
+                pwField = document.getElementById('confirm-password-signup');
+            } else if (targetId === 'password-login') {
+                pwField = document.getElementById('password-login');
+            }
+
+            if (!pwField) {
+                console.log('Password field not found');
+                return;
+            }
+
+            // Toggle the type attribute of the password field between text and password
+            if (pwField.type === 'password') {
+                pwField.type = 'text';
+                eyeIcon.classList.replace('ri-eye-off-line', 'ri-eye-line'); // Toggle eye icon
+                console.log('Password shown');
+            } else {
+                pwField.type = 'password';
+                eyeIcon.classList.replace('ri-eye-line', 'ri-eye-off-line'); // Toggle eye icon
+                console.log('Password hidden');
+            }
+        });
+    });
+});
 
 
-   // code to show/hidde password and change icon
-   pwShowHide.forEach(eyeIcon => {
-       eyeIcon.addEventListener("click", ()=> {
-           pwFields.forEach(pwField => {
-               if(pwField.type === "password") {
-                   pwField.type = "text";
-
-
-                   pwShowHide.forEach(icon => {
-                       icon.classList.replace("ri-eye-off-line", "ri-eye-line");
-                   })
-               }else{
-                   pwField.type = "password";
-
-
-                   pwShowHide.forEach(icon => {
-                       icon.classList.replace("ri-eye-line", "ri-eye-off-line");
-                   })
-               }
-           })
-       })
-   })
-
-
-// going to new page
+// Redirect to homepage upon successfuly login
 document.addEventListener("DOMContentLoaded", () => {
    const loginButton = document.querySelector(".login .button input[type='button']");
    const emailFields = document.querySelectorAll(".login input[type='text'][placeholder=' ']");
@@ -82,8 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
            .then(response => response.json())
            .then(data => {
                if (data.success) {
-                   // Login successful, redirect to the next page
-                   window.location.href = '/home'; // Replace '/next-page' with the actual URL of the next page
+                   // Login successful, redirect to homepage 
+                   window.location.href = '/home'; 
                } else {
                    // Login failed, display error message
                    document.getElementById('login-error').textContent = data.message;
@@ -102,6 +113,8 @@ document.addEventListener("DOMContentLoaded", () => {
    });
 });
 
+
+// Upon successful registration redirect to login section
 document.addEventListener("DOMContentLoaded", () => {
     const registerButton = document.querySelector(".signup .button input[type='button']");
     const nameField = document.getElementById("name-signup");
@@ -153,10 +166,12 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.success) {
                     // Registration successful, redirect to login page
-                    document.querySelector(".login-link").click();
+                    document.getElementById("registration").reset(); // Reset registration form to be empty
+                    document.querySelector(".login-link").click(); 
                 } else {
                     // Registration failed, display error message
                     document.getElementById('registration-error').textContent = data.message;
+                    errors.push({ field: 'register', message: 'Email already registered'});
                 }
             })
             .catch(error => {
@@ -174,9 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
 // code to switch between register and login pages
 signUp.addEventListener("click", ()=> {
     container.classList.add("active");
+    document.getElementById("log-in").reset();
  });
  login.addEventListener("click", ()=> {
     container.classList.remove("active");
+    document.getElementById("registration").reset();
  });
  
  
