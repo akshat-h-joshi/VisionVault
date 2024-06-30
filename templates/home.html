@@ -9,8 +9,12 @@
    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
    <!-- STYLES FILE -->
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
    <link rel="stylesheet" href="/static/css/home.css">
 
+   <!-- SCRIPTS -->
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
    <title>Home Page</title>
 </head>
 <body>
@@ -18,10 +22,10 @@
    <div class="container">
        <!-- Sidebar Section -->
        <aside>
-           <div class="toggle">
+           <div class="list">
                <div class="logo">
-                    <i class="icon ri-tree-fill"></i>
-                    <h2>Vision<span class="danger">Vault</span></h2>
+                    <i class="icon ri-tree-fill"></i> <!-- Company Logo -->
+                    <h2>Vision<span class="danger">Vault</span></h2> <!-- Company Name -->
                </div>
                <div class="close" id="close-btn">
                    <span class="material-icons-sharp">
@@ -31,31 +35,41 @@
            </div>
 
            <div class="sidebar">
+
+                <!-- Dashboard Button -->
                <a href="#" class="sidebar-button active" data-target="dashboard">
                    <span class="material-icons-sharp">
                        dashboard
                    </span>
                    <h3>Dashboard</h3>
                </a>
+
+                <!-- Profile Button -->
                <a href="#" class="sidebar-button" data-target="profile">
                    <span class="material-icons-sharp">
                        person_outline
                    </span>
                    <h3>Profile</h3>
                </a>
+
+                <!-- Goals Button -->
                <a href="#" class="sidebar-button" data-target="goals">
                    <span class="material-icons-sharp">
                        insights
                    </span>
                    <h3>Goals</h3>
                </a>
+
+                <!-- Garden Button -->
                <a href="#" class="sidebar-button" data-target="garden">
                     <span class="material-symbols-outlined">
                         forest
                     </span>
                    <h3>Garden</h3>
                </a>
-               <a href="#" class="sidebar-button">
+
+                <!-- Logout Button -->
+               <a href="#" class="sidebar-button" id="logout-button">
                    <span class="material-icons-sharp">
                        logout
                    </span>
@@ -65,95 +79,102 @@
        </aside>
        <!-- End of Sidebar Section -->
 
+                                <!-- Prompt and Alert Modals -->
+
+       <!-- Custom Alert Modal -->
+        <div id="customAlert" class="modal-custom">
+            <div id="customAlertContent" class="modal-content-custom">
+                <span class="close-btn-custom" onclick="closeAlert()">&times;</span>
+                <p id="alertMessage-custom"></p>
+            </div>
+        </div>
+
+        <!-- Custom Category Prompt Modal -->
+        <div id="customPromptCategory" class="modal-custom">
+            <div id="modalContentPrompt1" class="modal-content-custom">
+                <span class="close-btn-custom" onclick="closePrompt('customPromptCategory')">&times;</span>
+                <p>Enter a new category:</p>
+                <input type="text" id="promptInputCategory" class="promptInput-custom" placeholder="Category name">
+                <button id="promptSubmitButtonCategory" class="submit-button-prompt">Submit</button>
+            </div>
+        </div>
+
+        <!-- Custom Tree Selection Prompt Modal -->
+        <div id="customPromptTree" class="modal-custom">
+            <div id="modalContentPrompt2" class="modal-content-custom">
+                <span class="close-btn-custom" onclick="closePrompt('customPromptTree')">&times;</span>
+                <p>Please select a tree to plant:</p>
+                <select id="treeSelection" class="promptInput-custom">
+                    <option value="1">Pine Tree</option>
+                    <option value="2">Spruce Tree</option>
+                    <option value="3">Birch Tree</option>
+                    <option value="4">Cedar Tree</option>
+                </select>
+                <button id="promptSubmitButtonTree" class="submit-button-prompt">Submit</button>
+            </div>
+        </div>
+
+        <!-- Custom Category Deletion Confirmation Modal -->
+        <div id="customPromptConfirmation" class="modal-custom">
+            <div id="modalContentPrompt3" class="modal-content-custom">
+                <span class="close-btn-custom" onclick="closePrompt('customPromptConfirmation')">&times;</span>
+                <p>Are you sure you want to delete this category and all its associated goals? <br>This action cannot be undone.</p>
+                <button id="promptSubmitButtonConfirmation" class="submit-button-prompt">OK</button>
+            </div>
+        </div>
+
+        <!-- Custom Goal Deletion Confirmation Modal -->
+        <div id="customPromptConfirmationGoal" class="modal-custom">
+            <div id="modalContentPrompt4" class="modal-content-custom">
+                <span class="close-btn-custom" onclick="closePrompt('customPromptConfirmationGoal')">&times;</span>
+                <p>Are you sure you want to delete this goal</p>
+                <button id="promptSubmitButtonConfirmationGoal" class="submit-button-prompt">OK</button>
+            </div>
+        </div>
+
        <!-- Main Content -->
        <main>
-           <!-- Analyses -->
+           <!-- Dashboard Page -->
            <div class="page dashboard">
                 <h1>Dashboard</h1>
                 <div class="analyse">
-                    <div class="sales">
+
+                    <!-- Total Goals Count -->
+                    <div class="total-goals-container">
                         <div class="status">
                             <div class="info">
                                 <h3>Total Goals</h3>
-                                <h1>24</h1>
-                            </div>
-                            <div class="progress">
-                                <svg>
-                                    <circle cx="38" cy="38" r="36"></circle>
-                                </svg>
-                                <div class="percentage">
-                                    <p>+81%</p>
-                                </div>
+                                <h1 id="total-goals-count"></h1>
                             </div>
                         </div>
                     </div>
-                    <div class="visits">
+
+                    <!-- Completed Goals Count -->
+                    <div class="completed-goals-container">
                         <div class="status">
                             <div class="info">
-                                <h3>Site Visit</h3>
-                                <h1>24,981</h1>
-                            </div>
-                            <div class="progress">
-                                <svg>
-                                    <circle cx="38" cy="38" r="36"></circle>
-                                </svg>
-                                <div class="percentage">
-                                    <p>-48%</p>
-                                </div>
+                                <h3>Completed Goals</h3>
+                                <h1 id="completed-goals-count"></h1>
                             </div>
                         </div>
                     </div>
-                    <div class="searches">
+
+                    <!-- Goals In Progress Count -->
+                    <div class="goals-in-progress-container">
                         <div class="status">
                             <div class="info">
-                                <h3>Searches</h3>
-                                <h1>14,147</h1>
-                            </div>
-                            <div class="progress">
-                                <svg>
-                                    <circle cx="38" cy="38" r="36"></circle>
-                                </svg>
-                                <div class="percentage">
-                                    <p>+21%</p>
-                                </div>
+                                <h3>Goals in progress</h3>
+                                <h1 id="goals-in-progress-count"></h1>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- End of Analyses -->
     
-                <!-- New Users Section -->
-                <div class="new-users">
-                    <h2>New Users</h2>
-                    <div class="user-list">
-                        <div class="user">
-                            <img src="images/profile-2.jpg">
-                            <h2>Jack</h2>
-                            <p>54 Min Ago</p>
-                        </div>
-                        <div class="user">
-                            <img src="images/profile-3.jpg">
-                            <h2>Amir</h2>
-                            <p>3 Hours Ago</p>
-                        </div>
-                        <div class="user">
-                            <img src="images/profile-4.jpg">
-                            <h2>Ember</h2>
-                            <p>6 Hours Ago</p>
-                        </div>
-                        <div class="user">
-                            <img src="/static/img/plus.png">
-                            <h2>More</h2>
-                            <p>New User</p>
-                        </div>
-                    </div>
-                </div>
-                <!-- End of New Users Section -->
-    
-                <!-- Recent Orders Table -->
-                <div class="recent-orders">
-                    <h2>Recent Goals</h2>
-                    <table>
+                <!-- Upcoming Goals Table -->
+                <div class="upcoming-goals">
+                    <h2>Upcoming Goals</h2>
+                    <table id="upcomingGoalsTable">
                         <thead>
                             <tr>
                                 <th>Goal Name</th>
@@ -165,38 +186,89 @@
                         </thead>
                         <tbody></tbody>
                     </table>
-                    <a href="#">Show All</a>
                 </div>
-                <!-- End of Recent Orders -->
+                <!-- End of Upcoming Goals -->
            </div>
+
+           <!-- End Of Dashboard Page -->
+
+           <!-- Profile Page -->
            <div class="page profile">
-                <h1>Profile</h1>    
+                <h1>Profile</h1>
+                
+                <!-- Profile Image and User Name -->
                 <div class="profile-container">
-                    <h1>Akshat</h1>
-                    <img src="{{ profile_image_url }}" id="profile-pic">
+                    <h1>{{ user.name }}</h1>
+                    {% if user.profile_image %} <!-- Check if user has profile image saved. If not, use default -->
+                        <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" id="profile-pic">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/profile.png') }}" id="profile-pic-default">
+                    {% endif%}
                     <label for="input-file">Update image</label>
                     <input type="file" accept="image/jpeg, image/png, image/jpg" id="input-file">
                 </div>
-                <div class="info-container">
 
+                <!-- User Information/Statistics -->
+                <div class="info-container">
+                    <h1>User Information</h1>
+                    <p>Email: <span id="user-email"></span></p> <!-- Email field -->
+                    <p><button type="button" id="toggle-password" class="ri-eye-off-line"></button>Password: <!-- Password field -->
+                        <span class="password-container">
+                            <input type="password" id="user-password" readonly>
+                        </span>            
+                    </p>
+                    <!-- Tree Numbers -->
+                    <p>Pine Trees: <span id="pine-tree-number"></span></p> 
+                    <p>Spruce Trees: <span id="spruce-tree-number"></span></p>
+                    <p>Birch Trees: <span id="birch-tree-number"></span></p>
+                    <p>Cedar Trees: <span id="cedar-tree-number"></span></p>
+
+                    <!-- Prestige Level -->
+                    <p class="prestige-level"><i class="ri-vip-crown-line"></i>Prestige Level: <span id="user-prestige-level"></span></p>
+                    
+                    <!-- Graphical Analysis -->
+                    <div class="graphical-analysis make-graph-button" id="graphicalAnalysisButton">
+                        <div>
+                            <span class="material-icons-sharp">
+                                add
+                            </span>
+                            <h3>Graphical Analysis</h3>
+                        </div>
+                    </div>
+
+                    <!-- Graphical Analysis Modal Structure -->
+                    <div id="graphicalAnalysisModal" class="modal">
+                        <div class="modal-content" id="graphicalModalContent">
+                            <span class="close-button" id="closeButtonGraph">&times;</span>
+                            <canvas id="goalCompletionChart"></canvas> <!-- Where graph is added -->
+                        </div>
+                    </div>
                 </div>
            </div>
+
+           <!-- Goals Page -->
            <div class="page goals">
                 <h1>Goals</h1>
+
+                <!-- Main Container Where Everything is stored -->
                 <div class="goals-main-container">
                     <div class="title-container">Categories</div>
+
+                    <!-- Categories Container to store categories -->
                     <div class="goals-categories-container">
                         <div class="category" data-category="personal">Personal</div>
                         <div class="category" data-category="professional">Professional</div>
                         <div class="category" data-category="health">Health</div>
                         <!-- Dynamically added categories will be here -->
                     </div>
+
+                    <!-- Sub Container Within Main Container -->
                     <div class="goals-sub-container">
-                        <!-- Add a Goal button -->
-                        <button id="addGoalButton" class="goal-button">Add Goal</button>
-                        <button id="addCategoryButton" class="add-category-button">Add Category</button>
-                        <div class="table-container">
+                        <button id="addGoalButton" class="goal-button">Add Goal</button> <!-- Add Goal Button-->
+                        <button id="addCategoryButton" class="add-category-button">Add Category</button> <!-- Add Category Button -->
+                        <div class="table-container"> <!-- Container where table is stored -->
                             <table>
+                                <!-- Table headings -->
                                 <thead>
                                     <tr>
                                         <th>Goal Name</th>
@@ -206,6 +278,8 @@
                                         <th></th>
                                     </tr>
                                 </thead>
+
+                                <!-- Table information -->
                                 <tbody id="goalsTable">
                                     {% for goal in goals %}
                                     <tr data-category="{{ goal.goal_category }}" data-goal-id="{{ goal.id }}">
@@ -214,12 +288,13 @@
                                         <td>{{ goal.priority_level }}</td>
                                         <td class="progress-cell">
                                             {% if goal.total_tasks > 0 %}
-                                            {{ (goal.completed_tasks / goal.total_tasks) * 100 | round(2) }}%
+                                                {{ ((goal.completed_tasks / goal.total_tasks) * 100) | round(2) }}%
                                             {% else %}
-                                            0%
+                                                0%
                                             {% endif %}
                                         </td>
                                         <td>
+                                            <!-- Edit and Delete Goal Buttons -->
                                             <button class="edit-goal-button" data-goal-id="{{ goal.id }}"></button>
                                             <button class="delete-goal-button" data-goal-id="{{ goal.id }}"></button>
                                         </td>
@@ -232,12 +307,13 @@
                                 <!-- New Goal Modal -->
                     <div id="newGoalModal" class="modal">
                         <div class="modal-content">
-                            <!-- <div class="error-message" id="main-info-error">Hello</div> -->
-                            <span class="close-button">&times;</span>
+                            <span class="close-button" id="close-button-newgoal">&times;</span>
                             <button id="continueButton" class="continue-button">Continue</button>
                             <button id="backButton" class="back-button">Back</button>
                             <button id="finaliseButton" class="finalise-button">Finalise</button>
                             <h2>Add a New Goal</h2>
+
+                            <!-- Container for Tree Display -->
                             <div class="tree-container">
                                 <button id="prev" class="arrow">&#9664;</button>
                                 <div class="tree-info">
@@ -246,8 +322,10 @@
                                 </div>
                                 <button id="next" class="arrow">&#9654;</button>
                             </div>
+
+                            <!-- Container for inputting goal information -->
                             <div class="main-info-container">
-                                <!-- Form content goes here -->
+                                <!-- Form content -->
                                 <form id="goalForm" method="POST" action="/save_goal">
                                     <label for="goalName">Goal Name:</label>
                                     <input type="text" id="goalName" name="goalName" required>
@@ -275,6 +353,8 @@
                                     <textarea id="description" name="description" rows="4" required></textarea>
                                 </form>
                             </div>
+
+                            <!-- Container for specifying goal sub-tasks -->
                             <div class="sub-tasks-container">
                                 <div class="content-wrapper">
                                     <div class="vertical-line"></div>
@@ -282,8 +362,7 @@
                                         <div class="task-content"></div>
                                         <button id="add-task-button" class="add-task-button" onclick="addTasks()">+</button>
                                     </div>
-                                </div>
-                                    
+                                </div>     
                             </div>
                         </div>
                     </div>
@@ -295,12 +374,16 @@
                             <button id="continueButtonEdit" class="continue-button">Continue</button>
                             <button id="backButtonEdit" class="back-button">Back</button>
                             <h2>Edit Goal</h2>
+
+                            <!-- Edit Goal Tree Container -->
                             <div id="editGoalTreeContainer" class="tree-container">
                                 <div class="tree-info">
                                     <img id="tree-image-edit" class="" src="" alt="Tree">
                                     <p id="tree-name-edit">Tree Name</p>
                                 </div>
                             </div>
+
+                            <!-- Edit Goal Main Info Container -->
                             <div class="main-info-container">
                                 <form id="editGoalForm" method="POST" action="/update_goal">
                                     <label for="editGoalName">Goal Name:</label>
@@ -329,6 +412,8 @@
                                     <textarea id="editDescription" name="description" rows="4" required></textarea>
                                 </form>
                             </div>
+
+                            <!-- Edit Goals Sub Tasks Container -->
                             <div class="sub-tasks-container">
                                 <div class="content-wrapper">
                                     <div class="vertical-line"></div>
@@ -342,10 +427,18 @@
                     </div>
                 </div>    
            </div>
+
+           <!-- Garden Page -->
            <div class="page garden">
                 <h1>Garden</h1>
+
+                <!-- Overarching Garden Container -->
                 <div class="garden-main-container">
+                    
+                    <!-- Background image container -->
                     <div class="garden-background-container">
+
+                                                <!-- Separate Tree Containers (3) -->
                         <div class="garden-tree-container">
                             <div class="tree-frame" id="tree1Frame"></div>
                             <button id="addTreeButton1" class="add-tree-button" onclick="selectTree(1)">Add Tree</button>
@@ -361,12 +454,10 @@
                     </div>
                 </div>    
            </div>
-           
-
        </main>
        <!-- End of Main Content -->
 
-       <!-- Right Section -->
+       <!-- Right Section on Dashboard -->
        <div class="right-section">
            <div class="nav">
                <button id="menu-btn">
@@ -374,6 +465,7 @@
                        menu
                    </span>
                </button>
+               <!-- Dark Mode/Light Mode Switch -->
                <div class="dark-mode">
                    <span class="material-icons-sharp active">
                        light_mode
@@ -386,76 +478,23 @@
            </div>
            <!-- End of Nav -->
 
+           <!-- Profile Image On Dashboard -->
            <div class="user-profile">
                <div class="logo">
-                   <img src="/static/img/profile.png">
-                   <h2>Hey Akshat</h2>
+                {% if user.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" id="profile-pic-dashboard">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/profile.png') }}" id="profile-pic-dashboard-default">
+                {% endif%}
+                   <h2>Hey {{user.name}}</h2>
                    <p>Welcome to VisionVault!</p>
                </div>
            </div>
-
-           <div class="reminders">
-               <div class="header">
-                   <h2>Reminders</h2>
-                   <span class="material-icons-sharp">
-                       notifications_none
-                   </span>
-               </div>
-
-               <div class="notification">
-                   <div class="icon">
-                       <span class="material-icons-sharp">
-                           volume_up
-                       </span>
-                   </div>
-                   <div class="content">
-                       <div class="info">
-                           <h3>Workshop</h3>
-                           <small class="text_muted">
-                               08:00 AM - 12:00 PM
-                           </small>
-                       </div>
-                       <span class="material-icons-sharp">
-                           more_vert
-                       </span>
-                   </div>
-               </div>
-
-               <div class="notification deactive">
-                   <div class="icon">
-                       <span class="material-icons-sharp">
-                           edit
-                       </span>
-                   </div>
-                   <div class="content">
-                       <div class="info">
-                           <h3>Workshop</h3>
-                           <small class="text_muted">
-                               08:00 AM - 12:00 PM
-                           </small>
-                       </div>
-                       <span class="material-icons-sharp">
-                           more_vert
-                       </span>
-                   </div>
-               </div>
-
-               <div class="notification add-reminder">
-                   <div>
-                       <span class="material-icons-sharp">
-                           add
-                       </span>
-                       <h3>Add Reminder</h3>
-                   </div>
-               </div>
-
-           </div>
        </div>
-
-
    </div>
 
    <script src="/static/js/home.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>
 
