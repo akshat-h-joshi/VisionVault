@@ -1,3 +1,915 @@
+
+// Function to reset tasks to default (used when resetting modal)
+function resetTasks() {
+    const taskContainer = document.getElementById('task-container');
+    const tasks = taskContainer.querySelectorAll('.task-content');
+    
+    // Reset the first task (index 0) without deleting it
+    resetTask(tasks[0], false); 
+    
+    // Remove any tasks beyond the first one
+    for (let i = 1; i < tasks.length; i++) {
+        tasks[i].remove();
+    }
+}
+
+// Function to reset a single task content, used in conjunction with resetTasks()
+function resetTask(taskContent, hasDeleteButton) {
+    const taskLabel = taskContent.querySelector('.task-label');
+    taskLabel.textContent = 'Title';
+    taskLabel.contentEditable = true;
+
+    const taskText = taskContent.querySelector('.task-text');
+    taskText.textContent = '';
+    taskText.contentEditable = true;
+
+    // Show/hide delete button based on parameter
+    const deleteButton = taskContent.querySelector('.delete-task-button');
+    if (deleteButton) {
+        deleteButton.style.display = hasDeleteButton ? 'block' : 'none';
+    }
+}
+
+// Function to reset tree when opening new modal
+function resetTree() {
+    let originalTreeIndex = 0;
+    currentIndex = originalTreeIndex;
+    updateTree();
+}
+
+// Function to reset modal so that information doesn't linger from previous instance
+function resetModal(modal) {
+    const modalContent = modal.querySelector('.modal-content');
+
+    document.querySelector(".container").appendChild(modal);  // Move the modal back
+    modal.style.display = "none";
+    document.querySelector(".container").classList.remove("blurred");
+    modalContent.classList.remove("modal-active"); // Reset modal-active class
+    document.querySelectorAll('.error-message').forEach(error => {
+        error.remove();
+    });
+    
+    if (modal.id === 'newGoalModal') {
+        const goalForm = document.getElementById('goalForm');
+        goalForm.reset(); // Reset the form data
+        // Clear previous error messages
+        resetTasks(); // Reset the task info
+        resetTree(); // Reset the tree
+    }
+}
+
+// Function for adding tasks when add task button is clicked within add goal modal
+function addTasks() {
+    // Create a new task div
+    const newTask = document.createElement('div');
+    newTask.className = 'task-content';
+    
+    // Create label for the task
+    const newLabel = document.createElement('div');
+    newLabel.className = 'task-label';
+    newLabel.contentEditable = true; // Make the label editable
+    newLabel.textContent = 'Title';
+    newTask.appendChild(newLabel);
+
+    // Create delete button for task
+    const deleteButton = document.createElement('div');
+    deleteButton.className = 'delete-task-button';
+    deleteButton.onclick = function() {
+        newTask.remove(); // Remove the task div
+    };
+    newTask.appendChild(deleteButton);
+
+    const clickableArea = document.createElement('div');
+    clickableArea.className = 'clickable-area';
+    newTask.appendChild(clickableArea);
+
+    // Add an onclick event to show/hide information
+    clickableArea.onclick = function() {
+        toggleInfo(newTask);
+    };
+    
+    // Create text div for the task
+    const newText = document.createElement('div');
+    newText.className = 'task-text';
+    newText.contentEditable = true;
+    newText.textContent = '';
+    newTask.appendChild(newText);
+
+    // Find the container to insert new task
+    const container = document.getElementById('task-container');
+    if (container) {
+        // Insert the new task before the add button if it exists
+        const addButton = container.querySelector('.add-task-button');
+        if (addButton) {
+            container.insertBefore(newTask, addButton);
+        } else {
+            container.appendChild(newTask); // Fallback if addButton is not found
+        }
+    } else {
+        console.error('task-container not found in DOM');
+    }
+}
+
+// Toggle task text when clickable area (diamond) is clicked
+function toggleInfo(taskContent) {
+    const taskText = taskContent.querySelector('.task-text');
+
+    if (taskText.style.display === 'none') {
+        taskText.style.display = 'block';
+    } else {
+        taskText.style.display = 'none';
+    }
+}
+
+// Function to fetch goal information
+function fetchGoal(goalId) {
+    return fetch(`/get_goal/${goalId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json());
+}
+
+// Function to update user information on profile page
+function updateUserInfo(user) {
+    // Replace text content with new information from database
+    document.getElementById('user-prestige-level').textContent = user.prestige_level;
+    document.getElementById('pine-tree-number').textContent = user.pine_tree_number;
+    document.getElementById('spruce-tree-number').textContent = user.spruce_tree_number;
+    document.getElementById('birch-tree-number').textContent = user.birch_tree_number;
+    document.getElementById('cedar-tree-number').textContent = user.cedar_tree_number;
+}
+
+// Provide 'user' to updateUserInfo() to update user info
+function performActionThatUpdatesUserInfo() {
+    getUserId().then(userId => {
+        if (userId) {
+            fetch(`/user_info?user_id=${userId}`) // Replace with your actual endpoint
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const updatedUser = data.user_data;
+                        
+                        // Update the user info dynamically
+                        updateUserInfo(updatedUser);
+                    } else {
+                        console.error('Failed to update user data:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }).catch(error => {
+        console.error('Error fetching user ID:', error);
+    });
+}
+
+// Function to create task content
+function createTaskContent(goalId, taskId, label, text, completed) {
+    // Create task content div
+    const taskContent = document.createElement('div');
+    taskContent.classList.add('task-content');
+    if (completed) {
+        taskContent.classList.add('completed');
+    }
+
+    // Create task label (title) div
+    const taskLabel = document.createElement('div');
+    taskLabel.classList.add('task-label');
+    taskLabel.contentEditable = true; // Make the label editable
+    taskLabel.textContent = label || 'Title';
+    taskContent.appendChild(taskLabel);
+
+    // Create clickable area (diamond) div
+    const clickableArea = document.createElement('div');
+    clickableArea.className = 'clickable-area';
+    taskContent.appendChild(clickableArea);
+
+    clickableArea.onclick = function() {
+        toggleInfo(taskContent);
+    };
+
+    // Create tick icon 
+    const tickIcon = document.createElement('div');
+    tickIcon.className = 'complete-task-button';
+    taskContent.appendChild(tickIcon);
+
+    // Functionality to mark task as completed
+    tickIcon.onclick = function() {
+        // Check if the task is already completed
+    if (!taskContent.classList.contains('completed')) {
+        // Mark the task as completed
+        taskContent.classList.add('completed');
+        // Update the tree stage by incrementing
+        updateTreeStage(goalId);
+    }
+    };
+
+    const taskText = document.createElement('div');
+    taskText.classList.add('task-text');
+    taskText.contentEditable = true;
+    taskText.textContent = text || '';
+    taskContent.appendChild(taskText);
+
+    return taskContent;
+}
+
+
+
+// Function to add a new category
+function addCategory(category_name) {
+    getUserId().then(user_id => {
+        fetch('/add_category', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user_id: user_id, category_name: category_name }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(error => { throw new Error(error.message); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            updateCategoryDropdown('goalCategory');
+            updateCategoryDropdown('editGoalCategory');
+            updateCategoriesContainer();
+        })
+        .catch(error => {
+            console.error('Error adding category:', error);
+            showAlert('Failed to add category. Please try again.');
+        });
+    });
+}
+
+// Function to update the dropdown menu with categories
+function updateCategoryDropdown(selectId) {
+    const goalCategoryDropdown = document.getElementById(selectId);
+    if (!goalCategoryDropdown) {
+        console.error(`Element with id "${selectId}" not found.`);
+        return;
+    }
+    getUserId().then(user_id => {
+        fetch(`/categories/${user_id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch categories.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const preMadeCategories = ['Personal', 'Professional', 'Health'];
+
+            // Clear existing user-added categories
+            for (let i = goalCategoryDropdown.options.length - 1; i >= 0; i--) {
+                const option = goalCategoryDropdown.options[i];
+                if (!preMadeCategories.includes(option.value)) {
+                    goalCategoryDropdown.remove(i);
+                }
+            }
+
+            // Add categories from data to the dropdown
+            data.categories.forEach(category => {
+                if (!preMadeCategories.includes(category.name)) {
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    goalCategoryDropdown.appendChild(option);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching categories:', error);
+            showAlert('Failed to fetch categories. Please try again.');
+        });
+    });
+}
+
+// Re-bind click events after categories are updated
+function updateCategoriesContainer() {
+    getUserId().then(user_id => {
+        fetch(`/categories/${user_id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch categories.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                const categoriesContainer = document.querySelector('.goals-categories-container');
+
+                // Remove dynamically added categories
+                const preMadeCategories = ['personal', 'professional', 'health', 'all'];
+                const categoryElements = categoriesContainer.querySelectorAll('.category');
+                categoryElements.forEach(categoryElement => {
+                    if (!preMadeCategories.includes(categoryElement.getAttribute('data-category'))) {
+                        categoriesContainer.removeChild(categoryElement);
+                    }
+                });
+
+                // Add categories from data to the container
+                data.categories.forEach(category => {
+                    if (!preMadeCategories.includes(category.name.toLowerCase())) {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'category';
+                        categoryDiv.setAttribute('data-category', category.name.toLowerCase());
+                        categoryDiv.setAttribute('data-category-id', category.id); // Add category ID to the div
+                        categoryDiv.textContent = category.name;
+
+                        categoriesContainer.appendChild(categoryDiv);
+                    }
+                });
+
+                // Remove any existing delete button
+                const existingDeleteButton = document.querySelector('.delete-category-button');
+                if (existingDeleteButton) {
+                    existingDeleteButton.remove();
+                }
+
+                // Add the delete button at the end of the container
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-category-button';
+                deleteButton.textContent = 'X';
+                deleteButton.addEventListener('click', deleteSelectedCategory);
+                categoriesContainer.appendChild(deleteButton);
+
+                // Re-bind click events to the updated categories
+                bindCategoryClickEvents();
+            })
+            .catch(error => {
+                console.error('Error fetching categories:', error);
+                showAlert('Failed to fetch categories. Please try again.');
+            });
+    });
+}
+
+// Function to get the category name based on its attribute value
+function getCategoryName(categoryName) {
+    return fetch(`/get_category_name?category_name=${encodeURIComponent(categoryName)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch category name.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                return data.category_name;
+            } else {
+                console.error(`Error fetching category name: ${data.message}`);
+                throw new Error(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error in getCategoryName:', error);
+            throw error;
+        });
+}
+
+// Function to delete the selected category and its goals
+function deleteSelectedCategory() {
+    const selectedCategory = document.querySelector('.category.category-active');
+    if (!selectedCategory) {
+        showAlert('Please select a category to delete.');
+        return;
+    }
+
+    const categoryName = selectedCategory.getAttribute('data-category').toLowerCase();
+
+    // List of protected categories
+    const protectedCategories = ['all', 'personal', 'health', 'professional'];
+
+    // Check if the selected category is protected
+    if (protectedCategories.includes(categoryName.toLowerCase())) {
+        showAlert(`The category "${categoryName}" cannot be deleted.`);
+        return;
+    }
+
+    showPrompt('customPromptConfirmation', 'promptSubmitButtonConfirmation');
+
+
+    // Remove any existing event listeners on the OK button to avoid multiple triggers
+    const submitButton = document.getElementById("promptSubmitButtonConfirmation");
+    submitButton.replaceWith(submitButton.cloneNode(true));
+
+    // Handle OK button click
+    document.getElementById("promptSubmitButtonConfirmation").addEventListener("click", function() {
+        getCategoryName(categoryName).then((categoryName) => {
+    
+            fetch(`/delete_category_and_goals/${encodeURIComponent(categoryName)}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete category.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateCategoriesContainer();
+                updateCategoryDropdown('goalCategory');
+                updateCategoryDropdown('editGoalCategory');
+    
+                // Remove the goals associated with the deleted category from the table
+                const goalsTable = document.getElementById('goalsTable');
+                const rows = goalsTable.querySelectorAll(`#goalsTable tr[data-category="${categoryName}"]`);
+                rows.forEach(row => row.remove());
+                goalsInProgress = data.total_goals - data.completed_goals;
+                $('h1#total-goals-count').text(data.total_goals);
+                $('h1#completed-goals-count').text(data.completed_goals);
+                $('h1#goals-in-progress-count').text(goalsInProgress);
+                fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody');
+                closePrompt('customPromptConfirmation');
+            })
+            .catch(error => {
+                console.error('Error deleting category:', error);
+                showAlert('Failed to delete category. Please try again.');
+            });
+        }).catch(error => {
+            console.error('Error fetching category name:', error);
+            showAlert('Failed to fetch category name. Please try again.');
+        });
+    });
+}
+
+// Function to get the user ID
+function getUserId() {
+    return fetch('/get_user_id')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch user ID.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            return data.user_id;
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+            showAlert('Failed to fetch user ID. Please try again.');
+        });
+}
+
+// Ajax request to update dashboard information upon page reload
+$(document).ready(function() {
+    getUserId().then(userId => {
+        if (!userId) {
+            return;
+        }
+
+        $.ajax({
+            url: `/get_total_and_completed_goals/${userId}`,
+            type: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    const totalGoals = response.total_goals;
+                    $('h1#total-goals-count').text(totalGoals);
+                    const completedGoals = response.completed_goals;
+                    $('h1#completed-goals-count').text(completedGoals);
+                    const goalsInProgress = totalGoals - completedGoals;
+                    $('h1#goals-in-progress-count').text(goalsInProgress);
+                } else {
+                    console.error('Error fetching total goals:', response.message);
+                }
+            },
+            error: function(error) {
+                console.error('Error fetching total goals:', error);
+            }
+        });
+    });
+});
+
+// Function to handle category click
+function handleCategoryClick(event) {
+    const clickedCategory = event.target;
+    const categories = document.querySelectorAll('.goals-categories-container .category');
+
+    // Remove category-active class from all categories
+    categories.forEach(category => {
+        category.classList.remove('category-active');
+    });
+
+    // Add category-active class to the clicked category
+    clickedCategory.classList.add('category-active');
+
+    // Get the category name
+    const category = clickedCategory.getAttribute('data-category');
+
+    // Filter goals based on the selected category
+    filterGoalsByCategory(category);
+}
+
+// Add an "All" category to show all goals
+function addAllCategory() {
+    const allCategory = document.createElement('div');
+    allCategory.className = 'category category-active';
+    allCategory.setAttribute('data-category', 'all');
+    allCategory.textContent = 'All';
+    allCategory.addEventListener('click', handleCategoryClick);
+    document.querySelector('.goals-categories-container').prepend(allCategory);
+}
+
+// Function to update the goals table based on selected category
+function filterGoalsByCategory(category) {
+    const goalsTable = document.getElementById('goalsTable');
+    const rows = goalsTable.getElementsByTagName('tr');
+
+    for (let row of rows) {
+        const rowCategory = row.getAttribute('data-category');
+
+        if (!rowCategory || category === 'all' || rowCategory.toLowerCase() === category.toLowerCase()) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    }
+}
+
+// Function to bind click events to categories
+function bindCategoryClickEvents() {
+    const categories = document.querySelectorAll('.goals-categories-container .category');
+    categories.forEach(category => {
+        category.removeEventListener('click', handleCategoryClick); // Remove any previous event listeners
+        category.addEventListener('click', handleCategoryClick);
+    });
+}
+
+// Function to add goal
+function addGoal(data, goalCategory, goalName, dueDate, priorityLevel) {
+    // Create a new table row
+    const newRow = document.createElement('tr');
+    newRow.setAttribute('data-goal-id', data.goalId);
+    newRow.setAttribute('data-category', goalCategory);
+
+    // Create cells for each detail
+    const nameCell = document.createElement('td');
+    nameCell.textContent = goalName;
+    nameCell.classList.add('goal-name-cell'); 
+    newRow.appendChild(nameCell);
+
+    const dueDateCell = document.createElement('td');
+    dueDateCell.textContent = dueDate;
+    newRow.appendChild(dueDateCell);
+
+    const priorityCell = document.createElement('td');
+    priorityCell.textContent = priorityLevel;
+    newRow.appendChild(priorityCell);
+
+    // Calculate and update the progress percentage
+    const progressCell = document.createElement('td');
+    progressCell.textContent = '0.0%';
+    progressCell.classList.add('progress-cell');
+    newRow.appendChild(progressCell);
+
+    const actionCell = document.createElement('td');
+    const editButton = document.createElement('button');
+    editButton.setAttribute('data-goal-id', data.goalId);
+    editButton.classList.add('edit-goal-button'); 
+    actionCell.appendChild(editButton);
+
+    const deleteButton = document.createElement('button');
+    deleteButton.setAttribute('data-goal-id', data.goalId);
+    deleteButton.classList.add('delete-goal-button'); 
+    actionCell.appendChild(deleteButton);
+
+    newRow.appendChild(actionCell);
+
+    // Append the new row to the goals table
+    document.getElementById('goalsTable').appendChild(newRow);
+
+    resetModal(newGoalModal);
+    bindCategoryClickEvents();
+}
+
+// Function for selecting tree to plant in garden
+function selectTree(frameNumber) {
+    getUserId()
+        .then(userId => {
+            const treeTypes = ['Pine Tree', 'Spruce Tree', 'Birch Tree', 'Cedar Tree'];
+
+            // Display the custom modal for tree selection
+            showPrompt('customPromptTree', 'treeSelection');
+
+            const submitButton = document.getElementById('promptSubmitButtonTree');
+            const treeSelection = document.getElementById('treeSelection');
+
+            // Remove any existing event listeners on the submit button to avoid multiple triggers
+            submitButton.replaceWith(submitButton.cloneNode(true));
+            const newSubmitButton = document.getElementById('promptSubmitButtonTree');
+
+            newSubmitButton.addEventListener('click', function() {
+                const selectedTreeIndex = parseInt(treeSelection.value);
+
+                if (!isNaN(selectedTreeIndex) && selectedTreeIndex >= 1 && selectedTreeIndex <= 4) {
+                    const selectedTreeType = treeTypes[selectedTreeIndex - 1];
+
+                    fetch(`/check_tree_availability/${userId}/${selectedTreeType}`)
+                        .then(response => response.json())
+                        .then(data => {
+
+                            if (data.available) {
+                                const treeFrame = document.getElementById(`tree${frameNumber}Frame`);
+                                const imageName = `${selectedTreeType.toLowerCase().replace(' ', '-')}-stage-3`;
+                                treeFrame.style.backgroundImage = `url('/static/img/${imageName}.png')`;
+
+                                // Hide the add-tree-button after a tree is added
+                                const addTreeButton = document.getElementById(`addTreeButton${frameNumber}`);
+                                if (addTreeButton) {
+                                    addTreeButton.classList.add('add-tree-button-active');
+                                }
+
+                                checkFramesAndIncreasePrestige();
+
+                                // Update the tree type in the database
+                                fetch(`/update_tree_type/${userId}/${frameNumber}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ tree_type: selectedTreeType })
+                                })
+                                .then(response => response.json())
+                                .then(data => {
+                                    if (!data.success) {
+                                        console.error('Failed to update tree type:', data.message);
+                                    }
+                                    performActionThatUpdatesUserInfo();
+                                })
+                                .catch(error => {
+                                    console.error('Error updating tree type:', error);
+                                });
+
+                                // Close the custom modal after submission
+                                closePrompt('customPromptTree');
+
+                            } else {
+                                showAlert(`You don't have a ${selectedTreeType}.`);
+                                closePrompt('customPromptTree');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                        });
+                } else {
+                    showAlert('Please select a valid tree.');
+                }
+            });
+
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+            showAlert('Failed to fetch user ID. Please try again.');
+        });
+}
+
+// Function for checking whether frames are full and increasing prestige dynamically
+function checkFramesAndIncreasePrestige() {
+    getUserId()
+        .then(userId => {
+            fetch(`/check_frames_and_increase_prestige/${userId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Prestige level increased and frames reset!');
+                    // Reset the frames in the UI
+                    for (let i = 1; i <= 3; i++) {
+                        const treeFrame = document.getElementById(`tree${i}Frame`);
+                        treeFrame.style.backgroundImage = '';
+
+                        const addTreeButton = document.getElementById(`addTreeButton${i}`);
+                        if (addTreeButton) {
+                            addTreeButton.classList.remove('add-tree-button-active');
+                        }
+                    }
+                } else {
+                    return;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('An error occurred. Please try again.');
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching user ID:', error);
+            showAlert('Failed to fetch user ID. Please try again.');
+        });
+}
+
+// Function for showing custom alert
+function showAlert(message) {
+    const alertMessageElement = document.getElementById('alertMessage-custom');
+    if (alertMessageElement) {
+        alertMessageElement.textContent = message;
+        document.getElementById('customAlert').style.display = 'block';
+    } else {
+        console.error('Element with ID "alertMessage-custom" not found.');
+    }
+}
+
+// Function for closing custom alert
+function closeAlert() {
+    document.getElementById('customAlert').style.display = 'none';
+}
+
+// Function for showing custom prompt
+function showPrompt(modalId, inputId) {
+    const modal = document.getElementById(modalId);
+    const promptInput = document.getElementById(inputId);
+    // Check if the element is an input before setting its value
+    if (promptInput.tagName.toLowerCase() === 'input') {
+        promptInput.value = '';
+    }
+    if (modal) {
+        modal.style.display = 'block';
+    } else {
+        console.error(`Modal with ID "${modalId}" not found.`);
+    }
+}
+
+// Function for closing custom prompt
+function closePrompt(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    } else {
+        console.error(`Modal with ID "${modalId}" not found.`);
+    }
+}
+
+// Dom listener gor graphical analysis. Functions defined within to identify instances of chart
+document.addEventListener("DOMContentLoaded", () => {
+    var modal = document.getElementById("graphicalAnalysisModal");
+    var btn = document.getElementById("graphicalAnalysisButton");
+    var span = document.getElementsByClassName("close-button")[0];
+    var goalCompletionChart;
+
+    // Fetch goal completion data and generate chart when graphical analysis button is clicked
+    btn.onclick = function () {
+        getUserId()
+            .then(user_id => {
+                if (!user_id) {
+                    throw new Error('User ID is undefined or null.');
+                }
+                return fetchGoalCompletionData(user_id);
+            })
+            .then(data => {
+                if (!Array.isArray(data) || data.length === 0 || !data[0].hasOwnProperty('category')) {
+                    throw new Error('Invalid data structure received. Data received:', data);
+                }
+
+                const categories = data.map(item => item.category);
+                const completed_goals = data.map(item => item.completed_goals);
+                const total_goals = data.map(item => item.total_goals);
+                const goals_in_progress = data.map(item => item.goals_in_progress);
+
+                generateChart(categories, completed_goals, total_goals, goals_in_progress);
+                modal.style.display = "block";
+            })
+            .catch(error => {
+                console.error('Error in graphical analysis:', error);
+                showAlert('Failed to perform graphical analysis. Please try again.');
+            });
+    }
+
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // Close the modal when clicking outside of it
+    window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    });
+
+    // Function for fetching goal completion data, including total goals, completed goals and goals in progress
+    function fetchGoalCompletionData(user_id) {
+        return fetch(`/get_goal_completion_data/${user_id}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch goal completion data.');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                return data;
+            })
+            .catch(error => {
+                console.error('Error fetching goal completion data:', error);
+                throw error;
+            });
+    }
+
+    // Function for generating chart 
+    function generateChart(categories, completedGoals, totalGoals, goalsInProgress) {
+        if (goalCompletionChart instanceof Chart) {
+            goalCompletionChart.destroy();
+        }
+
+        const ctx = document.getElementById('goalCompletionChart').getContext('2d');
+
+        goalCompletionChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [{
+                        label: 'Total Goals',
+                        data: totalGoals,
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)', /* Softer green */
+                        borderColor: 'rgba(76, 175, 80, 1)', /* Softer green */
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Completed Goals',
+                        data: completedGoals,
+                        backgroundColor: 'rgba(244, 67, 54, 0.2)', /* Softer red */
+                        borderColor: 'rgba(244, 67, 54, 1)', /* Softer red */
+                        borderWidth: 1
+                    },
+                    
+                    {
+                        label: 'Goals In Progress',
+                        data: goalsInProgress,
+                        backgroundColor: 'rgba(33, 150, 243, 0.2)', /* Softer blue */
+                        borderColor: 'rgba(33, 150, 243, 1)', /* Softer blue */
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+});
+
+// Function for updating upcoming goals table 
+function fetchAndPopulateGoals(url, tableBodySelector) {
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const tableBody = document.querySelector(tableBodySelector);
+        tableBody.innerHTML = '';  // Clear existing table rows
+        
+        data.upcoming_goals.forEach(goal => {
+          const progress = goal.total_tasks > 0 ? ((goal.completed_tasks / goal.total_tasks) * 100).toFixed(2) + '%' : '0%';
+          const row = `
+            <tr data-category="${goal.goal_category}" data-goal-id="${goal.id}">
+              <td class="goal-name-cell">${goal.goal_name}</td>
+              <td>${goal.due_date}</td>
+              <td>${goal.priority_level}</td>
+              <td class="progress-cell">${progress}</td>
+            </tr>
+          `;
+          tableBody.innerHTML += row;  // Append each row to the table body
+        });
+      })
+      .catch(error => console.error('Error fetching goals:', error));
+}
+
+// Function for toggling password visibility in profile page
+function togglePasswordVisibility() {
+    const togglePasswordButton = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('user-password');
+
+    togglePasswordButton.addEventListener('click', () => {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle icon class
+        if (type === 'password') {
+            togglePasswordButton.classList.remove('ri-eye-line');
+            togglePasswordButton.classList.add('ri-eye-off-line');
+        } else {
+            togglePasswordButton.classList.remove('ri-eye-off-line');
+            togglePasswordButton.classList.add('ri-eye-line');
+        }
+    });
+}
+
 const sideMenu = document.querySelector('aside');
 const menuBtn = document.getElementById('menu-btn');
 const closeBtn = document.getElementById('close-btn');
@@ -65,624 +977,105 @@ document.addEventListener('DOMContentLoaded', function() {
         })
     })})
 
+    // Code to update profile image
     document.getElementById('input-file').addEventListener('change', function() {
         const file = this.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('profile-pic').src = e.target.result;
+            getUserId().then(user_id => {
+                if (!user_id) {
+                    console.error('User ID is not available.');
+                    return;
+                }
     
-                // Upload the image to the server
-                const formData = new FormData();
-                formData.append('profile_image', file);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const defaultProfilePicElement = document.getElementById('profile-pic-default');
+                    const profilePicElement = document.getElementById('profile-pic');
     
-                fetch('/upload_profile_image', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        console.log('Profile image updated successfully');
-                    } else {
-                        console.error('Failed to update profile image:', data.message);
+                    if (defaultProfilePicElement) {
+                        defaultProfilePicElement.src = e.target.result; // Update default image src
                     }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
-            reader.readAsDataURL(file);
-        }
-    });
-
-const Orders = [
-    {
-        productName: 'JavaScript Tutorial',
-        productNumber: '85743',
-        paymentStatus: 'Due',
-        status: 'Pending'
-    },
-    {
-        productName: 'CSS Full Course',
-        productNumber: '97245',
-        paymentStatus: 'Refunded',
-        status: 'Declined'
-    },
-    {
-        productName: 'Flex-Box Tutorial',
-        productNumber: '36452',
-        paymentStatus: 'Paid',
-        status: 'Active'
-    },
-]
-
-// Orders.forEach(goal => {
-//     const tr = document.createElement('tr');
-//     const trContent = `
-//         <td>${goal.productName}</td>
-//         <td>${goal.productNumber}</td>
-//         <td>${goal.paymentStatus}</td>
-//         <td class="${goal.status === 'Declined' ? 'danger' : goal.status === 'Pending' ? 'warning' : 'primary'}">${goal.status}</td>
-//         <td class="primary">Details</td>
-//     `;
-//     tr.innerHTML = trContent;
-//     document.querySelector('table tbody').appendChild(tr);
-// });
-
-function resetTasks() {
-    const taskContainer = document.getElementById('task-container');
-    const tasks = taskContainer.querySelectorAll('.task-content');
     
-    // Reset the first task (index 0) without deleting it
-    resetTask(tasks[0], false); 
-    
-    // Remove any tasks beyond the first one
-    for (let i = 1; i < tasks.length; i++) {
-        tasks[i].remove();
-    }
-}
-
-function fetchGoal(goalId) {
-    return fetch(`/get_goal/${goalId}`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => response.json());
-}
-
-
-// Function to create task content
-function createTaskContent(goalId, taskId, label, text, completed) {
-    const taskContent = document.createElement('div');
-    taskContent.classList.add('task-content');
-    if (completed) {
-        taskContent.classList.add('completed');
-    }
-
-    const taskLabel = document.createElement('div');
-    taskLabel.classList.add('task-label');
-    taskLabel.contentEditable = true; // Make the label editable
-    taskLabel.textContent = label || 'Title';
-    taskContent.appendChild(taskLabel);
-
-    const clickableArea = document.createElement('div');
-    clickableArea.className = 'clickable-area';
-    taskContent.appendChild(clickableArea);
-
-    clickableArea.onclick = function() {
-        toggleInfo(taskContent);
-    };
-
-    const tickIcon = document.createElement('div');
-    tickIcon.className = 'complete-task-button';
-    taskContent.appendChild(tickIcon);
-
-    // Functionality to mark task as completed
-    tickIcon.onclick = function() {
-        // Check if the task is already completed
-    if (!taskContent.classList.contains('completed')) {
-        // Mark the task as completed
-        taskContent.classList.add('completed');
-        console.log('Task Completed:', true);
-        // Update the tree stage by incrementing
-        updateTreeStage(goalId, true);
-    }
-    };
-
-    const taskText = document.createElement('div');
-    taskText.classList.add('task-text');
-    taskText.contentEditable = true;
-    taskText.textContent = text || '';
-    taskContent.appendChild(taskText);
-
-    return taskContent;
-}
-
-// Function to reset a single task content
-function resetTask(taskContent, hasDeleteButton) {
-    const taskLabel = taskContent.querySelector('.task-label');
-    taskLabel.textContent = 'Title';
-    taskLabel.contentEditable = true;
-
-    const taskText = taskContent.querySelector('.task-text');
-    taskText.textContent = '';
-    taskText.contentEditable = true;
-
-    // Show/hide delete button based on parameter
-    const deleteButton = taskContent.querySelector('.delete-task-button');
-    if (deleteButton) {
-        deleteButton.style.display = hasDeleteButton ? 'block' : 'none';
-    }
-}
-
-function resetTree() {
-    let originalTreeIndex = 0;
-    currentIndex = originalTreeIndex;
-    updateTree();
-}
-
-function resetModal(modal) {
-    const modalContent = modal.querySelector('.modal-content');
-
-    document.querySelector(".container").appendChild(modal);  // Move the modal back
-    modal.style.display = "none";
-    document.querySelector(".container").classList.remove("blurred");
-    modalContent.classList.remove("modal-active"); // Reset modal-active class
-    document.querySelectorAll('.error-message').forEach(error => {
-        error.remove();
-    });
-    
-    if (modal.id === 'newGoalModal') {
-        const goalForm = document.getElementById('goalForm');
-        goalForm.reset(); // Reset the form data
-        // Clear previous error messages
-        resetTasks(); // Reset the task info
-        resetTree(); // Reset the tree
-    }
-}
-
-// Function to add a new category
-function addCategory(category_name) {
-    getUserId().then(user_id => {
-        fetch('/add_category', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: user_id, category_name: category_name }),
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(error => { throw new Error(error.message); });
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Category added successfully:', data);
-            updateCategoryDropdown('goalCategory');
-            updateCategoryDropdown('editGoalCategory');
-            updateCategoriesContainer();
-        })
-        .catch(error => {
-            console.error('Error adding category:', error);
-            alert('Failed to add category. Please try again.');
-        });
-    });
-}
-
-// Function to update the dropdown menu with categories
-function updateCategoryDropdown(selectId) {
-    const goalCategoryDropdown = document.getElementById(selectId);
-    if (!goalCategoryDropdown) {
-        console.error(`Element with id "${selectId}" not found.`);
-        return;
-    }
-    getUserId().then(user_id => {
-        fetch(`/categories/${user_id}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const preMadeCategories = ['Personal', 'Professional', 'Health'];
-
-            // Clear existing user-added categories
-            for (let i = goalCategoryDropdown.options.length - 1; i >= 0; i--) {
-                const option = goalCategoryDropdown.options[i];
-                if (!preMadeCategories.includes(option.value)) {
-                    goalCategoryDropdown.remove(i);
-                }
-            }
-
-            // Add categories from data to the dropdown
-            data.categories.forEach(category => {
-                if (!preMadeCategories.includes(category.name)) {
-                    const option = document.createElement('option');
-                    option.value = category.name;
-                    option.textContent = category.name;
-                    goalCategoryDropdown.appendChild(option);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching categories:', error);
-            alert('Failed to fetch categories. Please try again.');
-        });
-    });
-}
-
-// Re-bind click events after categories are updated
-function updateCategoriesContainer() {
-    getUserId().then(user_id => {
-        fetch(`/categories/${user_id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Failed to fetch categories.');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const categoriesContainer = document.querySelector('.goals-categories-container');
-
-                // Remove dynamically added categories
-                const preMadeCategories = ['personal', 'professional', 'health', 'all'];
-                const categoryElements = categoriesContainer.querySelectorAll('.category');
-                categoryElements.forEach(categoryElement => {
-                    if (!preMadeCategories.includes(categoryElement.getAttribute('data-category'))) {
-                        categoriesContainer.removeChild(categoryElement);
+                    if (profilePicElement) {
+                        profilePicElement.src = e.target.result; // Update profile image src
                     }
-                });
-
-                // Add categories from data to the container
-                data.categories.forEach(category => {
-                    if (!preMadeCategories.includes(category.name.toLowerCase())) {
-                        const categoryDiv = document.createElement('div');
-                        categoryDiv.className = 'category';
-                        categoryDiv.setAttribute('data-category', category.name.toLowerCase());
-                        categoryDiv.setAttribute('data-category-id', category.id); // Add category ID to the div
-                        categoryDiv.textContent = category.name;
-
-                        categoriesContainer.appendChild(categoryDiv);
-                    }
-                });
-
-                // Remove any existing delete button
-                const existingDeleteButton = document.querySelector('.delete-category-button');
-                if (existingDeleteButton) {
-                    existingDeleteButton.remove();
-                }
-
-                // Add the delete button at the end of the container
-                const deleteButton = document.createElement('button');
-                deleteButton.className = 'delete-category-button';
-                deleteButton.textContent = 'X';
-                deleteButton.addEventListener('click', deleteSelectedCategory);
-                categoriesContainer.appendChild(deleteButton);
-
-                // Re-bind click events to the updated categories
-                bindCategoryClickEvents();
-            })
-            .catch(error => {
-                console.error('Error fetching categories:', error);
-                alert('Failed to fetch categories. Please try again.');
-            });
-    });
-}
-
-// Function to get the category name based on its attribute value
-function getCategoryName(categoryName) {
-    console.log(`Fetching category name for: ${categoryName}`);
-    return fetch(`/get_category_name?category_name=${encodeURIComponent(categoryName)}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch category name.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                console.log(`Fetched category name: ${data.category_name}`);
-                return data.category_name;
-            } else {
-                console.error(`Error fetching category name: ${data.message}`);
-                throw new Error(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error in getCategoryName:', error);
-            throw error;
-        });
-}
-
-// Function to delete the selected category and its goals
-function deleteSelectedCategory() {
-    const selectedCategory = document.querySelector('.category.category-active');
-    if (!selectedCategory) {
-        alert('Please select a category to delete.');
-        return;
-    }
-
-    const categoryName = selectedCategory.getAttribute('data-category').toLowerCase();
-
-    // List of protected categories
-    const protectedCategories = ['add', 'personal', 'health', 'professional'];
-
-    // Check if the selected category is protected
-    if (protectedCategories.includes(categoryName.toLowerCase())) {
-        alert(`The category "${categoryName}" cannot be deleted.`);
-        return;
-    }
-
-    // Show a confirmation prompt
-    const confirmation = window.confirm(`Are you sure you want to delete the category "${categoryName}" and all its associated goals? This action cannot be undone.`);
-    if (!confirmation) {
-        return; // If the user cancels, do nothing
-    }
-
-    console.log(`Deleting category: ${categoryName}`); // Log the category name for debugging
-
-    getCategoryName(categoryName).then((categoryName) => {
-        console.log(`Deleting category: ${categoryName}`); // Log the category name for debugging
-
-        fetch(`/delete_category_and_goals/${encodeURIComponent(categoryName)}`, {
-            method: 'DELETE',
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to delete category.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Category and associated goals deleted successfully:', data);
-            updateCategoriesContainer();
-
-            // Remove the goals associated with the deleted category from the table
-            const goalsTable = document.getElementById('goalsTable');
-            const rows = goalsTable.querySelectorAll(`tr[data-category="${categoryName}"]`);
-            rows.forEach(row => row.remove());
-        })
-        .catch(error => {
-            console.error('Error deleting category:', error);
-            alert('Failed to delete category. Please try again.');
-        });
-    }).catch(error => {
-        console.error('Error fetching category name:', error);
-        alert('Failed to fetch category name. Please try again.');
-    });
-}
-
-// Function to get the user ID
-function getUserId() {
-    return fetch('/get_user_id')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch user ID.');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            console.log('Fetched user ID:', data.user_id);  // Log the fetched user ID
-            return data.user_id;
-        })
-        .catch(error => {
-            console.error('Error fetching user ID:', error);
-            alert('Failed to fetch user ID. Please try again.');
-        });
-}
-
-// Function to handle category click
-function handleCategoryClick(event) {
-    const clickedCategory = event.target;
-    const categories = document.querySelectorAll('.goals-categories-container .category');
-
-    // Remove category-active class from all categories
-    categories.forEach(category => {
-        category.classList.remove('category-active');
-    });
-
-    // Add category-active class to the clicked category
-    clickedCategory.classList.add('category-active');
-
-    // Get the category name
-    const category = clickedCategory.getAttribute('data-category');
-
-    // Filter goals based on the selected category
-    filterGoalsByCategory(category);
-}
-
-// Add an "All" category to show all goals
-function addAllCategory() {
-    const allCategory = document.createElement('div');
-    allCategory.className = 'category category-active';
-    allCategory.setAttribute('data-category', 'all');
-    allCategory.textContent = 'All';
-    allCategory.addEventListener('click', handleCategoryClick);
-    document.querySelector('.goals-categories-container').prepend(allCategory);
-}
-
-// Function to update the goals table based on selected category
-function filterGoalsByCategory(category) {
-    const goalsTable = document.getElementById('goalsTable');
-    const rows = goalsTable.getElementsByTagName('tr');
-
-    for (let row of rows) {
-        const rowCategory = row.getAttribute('data-category');
-
-        if (!rowCategory || category === 'all' || rowCategory.toLowerCase() === category.toLowerCase()) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    }
-}
-
-// Function to bind click events to categories
-function bindCategoryClickEvents() {
-    const categories = document.querySelectorAll('.goals-categories-container .category');
-    categories.forEach(category => {
-        category.removeEventListener('click', handleCategoryClick); // Remove any previous event listeners
-        category.addEventListener('click', handleCategoryClick);
-    });
-}
-
-function addGoal(data, goalCategory, goalName, dueDate, priorityLevel) {
-    // Create a new table row
-    const newRow = document.createElement('tr');
-    newRow.setAttribute('data-goal-id', data.goalId);
-    newRow.setAttribute('data-category', goalCategory);
-
-    // Create cells for each detail
-    const nameCell = document.createElement('td');
-    nameCell.textContent = goalName;
-    nameCell.classList.add('goal-name-cell'); // Add class for styling if needed
-    newRow.appendChild(nameCell);
-
-    const dueDateCell = document.createElement('td');
-    dueDateCell.textContent = dueDate;
-    newRow.appendChild(dueDateCell);
-
-    const priorityCell = document.createElement('td');
-    priorityCell.textContent = priorityLevel;
-    newRow.appendChild(priorityCell);
-
-    // Calculate and update the progress percentage
-    const progressCell = document.createElement('td');
-    progressCell.textContent = '0.0%';
-    newRow.appendChild(progressCell);
-
-    const actionCell = document.createElement('td');
-    const editButton = document.createElement('button');
-    editButton.setAttribute('data-goal-id', data.goalId);
-    editButton.classList.add('edit-goal-button'); // Add class for styling if needed
-    actionCell.appendChild(editButton);
-
-    const deleteButton = document.createElement('button');
-    deleteButton.setAttribute('data-goal-id', data.goalId);
-    deleteButton.classList.add('delete-goal-button'); // Add class for styling if needed
-    actionCell.appendChild(deleteButton);
-
-    newRow.appendChild(actionCell);
-
-    // Append the new row to the goals table
-    document.getElementById('goalsTable').appendChild(newRow);
-
-    resetModal(newGoalModal);
-    bindCategoryClickEvents();
-}
-
-function selectTree(frameNumber) {
-    getUserId()
-        .then(userId => {
-            const treeTypes = ['Pine Tree', 'Spruce Tree', 'Birch Tree', 'Cedar Tree'];
-            const selectedTree = prompt('Please select a tree to plant:\n1. Pine Tree\n2. Spruce Tree\n3. Birch Tree\n4. Cedar Tree');
-
-            console.log('Selected tree:', selectedTree);
-
-            if (selectedTree !== null && selectedTree !== '' && !isNaN(selectedTree) && selectedTree >= 1 && selectedTree <= 4) {
-                const selectedTreeType = treeTypes[selectedTree - 1];
-                console.log('Selected tree type:', selectedTreeType);
-
-                fetch(`/check_tree_availability/${userId}/${selectedTreeType}`)
+    
+                    // Create a FormData object
+                    const formData = new FormData();
+                    formData.append('profile_image', file);
+                    formData.append('user_id', user_id);
+    
+                    // Send the file data to the server
+                    fetch('/upload_profile_image', {
+                        method: 'POST',
+                        body: formData
+                    })
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Response data:', data);
-
-                        if (data.available) {
-                            const treeFrame = document.getElementById(`tree${frameNumber}Frame`);
-                            const imageName = `${selectedTreeType.toLowerCase().replace(' ', '-')}-stage-3`;
-                            console.log('Image name:', imageName);
-                            treeFrame.style.backgroundImage = `url('/static/img/${imageName}.png')`;
-
-                            // Hide the add-tree-button after a tree is added
-                            const addTreeButton = document.getElementById(`addTreeButton${frameNumber}`);
-                            if (addTreeButton) {
-                                addTreeButton.classList.add('add-tree-button-active');
+                        if (data.success) {
+                            const profilePicDashboardElement = document.getElementById('profile-pic-dashboard');
+                            if (profilePicDashboardElement) {
+                                profilePicDashboardElement.src = data.profile_image_url;
                             }
-
-                            checkFramesAndIncreasePrestige()
-
-                            // Update the tree type in the database
-                            fetch(`/update_tree_type/${userId}/${frameNumber}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ tree_type: selectedTreeType })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (!data.success) {
-                                    console.error('Failed to update tree type:', data.message);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error updating tree type:', error);
-                            });
-
+                            const profilePicDashboardDefaultElement = document.getElementById('profile-pic-dashboard-default');
+                            if (profilePicDashboardDefaultElement) {
+                                profilePicDashboardDefaultElement.src = data.profile_image_url;
+                            }
                         } else {
-                            alert(`You don't have a ${selectedTreeType}.`);
+                            console.error('Failed to update profile image:', data.message);
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
                     });
-            } else {
-                alert('Please input a valid number (1 to 4) to select a tree.');
-                console.log('Invalid selection:', selectedTree);
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching user ID:', error);
-            alert('Failed to fetch user ID. Please try again.');
-        });
-}
-
-function checkFramesAndIncreasePrestige() {
-    getUserId()
-        .then(userId => {
-            fetch(`/check_frames_and_increase_prestige/${userId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Prestige level increased and frames reset!');
-                    // Reset the frames in the UI
-                    for (let i = 1; i <= 3; i++) {
-                        const treeFrame = document.getElementById(`tree${i}Frame`);
-                        treeFrame.style.backgroundImage = '';
-
-                        const addTreeButton = document.getElementById(`addTreeButton${i}`);
-                        if (addTreeButton) {
-                            addTreeButton.classList.remove('add-tree-button-active');
-                        }
-                    }
-                } else {
-                    return;
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                reader.readAsDataURL(file);
+            }).catch(error => {
+                console.error('Error fetching user ID:', error);
             });
-        })
-        .catch(error => {
-            console.error('Error fetching user ID:', error);
-            alert('Failed to fetch user ID. Please try again.');
+        }
+    });
+
+    getUserId().then(userId => {
+        if (userId) {
+            fetch(`/user_info?user_id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.user_data;
+                        document.getElementById('user-email').textContent = user.email;
+                        document.getElementById('user-password').value = user.password;
+                        updateUserInfo(user);
+                        // Initial setup for password visibility toggle
+                        togglePasswordVisibility(); // Call function to set initial state
+                    } else {
+                        console.error('Failed to fetch user data:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    }).catch(error => {
+        console.error('Error fetching user ID:', error);
+    });
+
+    $('#logout-button').on('click', function() {
+        $.ajax({
+            type: 'GET',
+            url: '/logout',
+            success: function(response) {
+                // Handle successful logout
+                window.location.href = '/'; // Redirect to login page
+            },
+            error: function(error) {
+                // Handle error
+                console.error('Logout error:', error.responseJSON.message);
+            }
         });
-}
+    });
+  
+  
 
                     // ADD GOAL DOM LISTENER
 
@@ -698,15 +1091,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const goalCategoryField = document.getElementById("goalCategory");
     const descriptionField = document.getElementById("description");
     const addCategoryButton = document.querySelector('.add-category-button');
-    const deleteCategoryButtons = document.querySelectorAll('.delete-category-button');
-    const today = new Date().toISOString().split('T')[0];
     
-    dueDateField.setAttribute('min', today);
-
-    dueDateField.addEventListener('keydown', function (e) {
-        e.preventDefault(); // Prevent any key input
+    // custom calendar 
+    flatpickr("#dueDate", {
+        dateFormat: "Y-m-d",
+        minDate: "today" // Disallow dates in the past
     });
 
+    fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody');
     updateCategoryDropdown('goalCategory');
     updateCategoriesContainer();
     addAllCategory();
@@ -734,35 +1126,38 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => {
             console.error('Error fetching user ID:', error);
-            alert('Failed to fetch user ID. Please try again.');
+            showAlert('Failed to fetch user ID. Please try again.');
         });
 
     // Add Category button click handler
     addCategoryButton.addEventListener("click", () => {
-        const category_name = prompt("Enter a new category:");
-        if (category_name && category_name.trim() !== "") {
-            addCategory(category_name);
-        }
+        const promptInput = document.getElementById('promptInputCategory');
+        const submitButton = document.getElementById('promptSubmitButtonCategory');
+
+        showPrompt('customPromptCategory', 'promptInputCategory');
+
+        // Remove any existing event listeners on the submit button to avoid multiple triggers
+        submitButton.replaceWith(submitButton.cloneNode(true));
+        const newSubmitButton = document.getElementById('promptSubmitButtonCategory');
+
+            // Handle submission of the custom prompt form
+        newSubmitButton.addEventListener('click', () => {
+            const category_name = promptInput.value.trim();
+            if (category_name !== "") {
+                addCategory(category_name);
+                closePrompt('customPromptCategory');
+            }
+        })
     });
     
-    deleteCategoryButtons.forEach(button => {
-        button.addEventListener('click', function(event) {
-            const categoryElement = event.target.closest('.category');
-            const category = categoryElement.dataset.category;
-
-            if (confirm(`Are you sure you want to delete the category "${category}"?`)) {
-                deleteCategory(category);
-            }
-        });
-    });
-
+    // Add goal button click to open add goal modal
     document.getElementById("addGoalButton").onclick = function() {
         document.body.appendChild(newGoalModal);  // Move the modal to the body
         newGoalModal.style.display = "block";
         document.querySelector(".container").classList.add("blurred");
     }
     
-    document.querySelector(".close-button").onclick = function() {
+    document.getElementById("close-button-newgoal").onclick = function() {
         resetModal(newGoalModal);
     }
     
@@ -773,6 +1168,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
+    // After clicking continue button
     continueButton.addEventListener("click", () => {
         // Clear previous error messages
         document.querySelectorAll('.error-message').forEach(error => {
@@ -821,7 +1217,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     tasks.push({
                         label: task.querySelector('.task-label').textContent.trim(),
                         text: task.querySelector('.task-text').textContent.trim(),
-                        completed: task.classList.contains('completed') // Assuming completed tasks have a 'completed' class
+                        completed: task.classList.contains('completed')
                     });
                 });
 
@@ -844,18 +1240,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Log extracted details for verification
-                        console.log('Goal Name:', goalName);
-                        console.log('Due Date:', dueDate);
-                        console.log('Priority Level:', priorityLevel);
-                        console.log('Goal Category:', goalCategory);
-
-                        alert('Goal saved successfully!'); 
+                        $('h1#total-goals-count').text(data.total_goals);
+                        const goalsInProgress = data.total_goals - data.completed_goals;
+                        $('h1#goals-in-progress-count').text(goalsInProgress);
+                        showAlert('Goal saved successfully!'); 
                         // Append the new goal to the table using the refreshGoals function
                         addGoal(data, goalCategory, goalName, dueDate, priorityLevel);
+                        fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody');
 
                     } else {
-                        alert('Failed to save goal: ' + data.message);
+                        showAlert('Failed to save goal: ' + data.message);
                     }
                 })
                 .catch(error => {
@@ -864,6 +1258,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     
+    // Back button for moving back to first seciton of add goal container
     backButton.addEventListener("click", () => {
         modalContent.classList.remove("modal-active");
     })
@@ -871,6 +1266,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
 });
+
 
                             // EDIT GOAL DOM LISTENER // 
 
@@ -884,12 +1280,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateCategoryDropdown('editGoalCategory');
 
+    // Custom calendar for edit goal modal
+    flatpickr("#editDueDate", {
+        dateFormat: "Y-m-d",
+        minDate: "today"
+    });
+
     // Check to see if edit goal button is clicked, and determine which goal it has been clicked for 
     document.getElementById("goalsTable").addEventListener("click", function(event) {
         if (event.target && event.target.classList.contains('edit-goal-button')) {
             const button = event.target;
             const goalId = button.getAttribute('data-goal-id');
-            console.log('Button clicked, goalId:', goalId); // Log goalId
             editGoalModal.setAttribute('data-goal-id', goalId);
             document.body.appendChild(editGoalModal);  // Move the modal to the body
             document.querySelector(".container").classList.add("blurred");
@@ -900,7 +1301,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Function for opening edit goal modal
     function openEditModal(goalId) {
-        console.log('Fetching goal data for goalId:', goalId); // Log goalId before fetch 
         fetch(`/get_goal/${goalId}`)
         .then(response => response.json())
         .then(data => {
@@ -908,15 +1308,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 // Clear previous sub-tasks
                 const taskContainer = document.getElementById('task-container-edit');
                 const tasks = taskContainer.querySelectorAll('.task-content');
-                const today = new Date().toISOString().split('T')[0];
-                const dueDateField = document.getElementById("editDueDate");
                 
-                dueDateField.setAttribute('min', today);
-
-                dueDateField.addEventListener('keydown', function (e) {
-                    e.preventDefault(); // Prevent any key input
-                });
-
                 if (taskContainer) {
 
                     // Clear existing task contents
@@ -938,7 +1330,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     document.getElementById('editGoalCategory').value = data.goal.goalCategory;
                     document.getElementById('editDescription').value = data.goal.description;
 
-                    console.log(data.goal.treeSelected);
 
                     // Populate sub-tasks
                     data.goal.tasks.forEach(task => {
@@ -949,16 +1340,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         taskContainer.insertBefore(taskContent, endButton);
                     });
 
-                    // Update tree info
+                    // Fetch tree info
                     const treeName = data.goal.treeSelected;
-                    const treeStage = data.goal.treeStage;
-                    updateTreeInfo(treeName, treeStage);
+                    fetchTreeInfo(treeName, data.goal.total_tasks, data.goal.completed_tasks);
 
                 } else {
                     console.error('Task container not found in DOM');
                 }
             } else {
-                alert('Failed to load goal data: ' + data.message);
+                showAlert('Failed to load goal data: ' + data.message);
             }
         })
         .catch(error => {
@@ -966,10 +1356,12 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Close button
     closeEditButton.onclick = function() {
         resetModal(editGoalModal);
     }
 
+    // Close when clicking outside modal
     window.onclick = function(event) {
         if (event.target == editGoalModal) {
             resetModal(editGoalModal);
@@ -1022,6 +1414,7 @@ document.addEventListener("DOMContentLoaded", () => {
         modalContentEdit.classList.remove("modal-active");
     })
 
+    // Finalise button for edits
     saveEditButton.onclick = function() {
         const goalId = editGoalModal.getAttribute('data-goal-id');
         const goalName = document.getElementById('editGoalName').value.trim();
@@ -1036,10 +1429,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('#task-container-edit .task-content').forEach(task => {
             const completed = task.classList.contains('completed');
             if (completed) {
-                completedTasks++;
+                completedTasks++; // Increment completed tasks
             }
             tasks.push({
-                id: task.getAttribute('data-task-id'), // Assuming each task has a data-task-id attribute
+                id: task.getAttribute('data-task-id'), 
                 label: task.querySelector('.task-label').textContent.trim(),
                 text: task.querySelector('.task-text').textContent.trim(),
                 completed: completed
@@ -1048,7 +1441,6 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const totalTasks = tasks.length;
         const allTasksCompleted = (completedTasks === totalTasks);
-        const treeStage = Math.max(1, Math.ceil((completedTasks / totalTasks) * 4));
         
         if (allTasksCompleted) {
             // Send a POST request to complete the goal if all tasks are completed
@@ -1061,14 +1453,19 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Goal completed successfully!');
-                    const row = document.querySelector(`tr[data-goal-id="${goalId}"]`);
+                    showAlert('Goal completed successfully!');
+                    const row = document.querySelector(`#goalsTable tr[data-goal-id="${goalId}"]`);
                     if (row) {
-                        row.remove();
+                        row.remove(); // Remove goal from table
                     }
+                    document.querySelector('h1#completed-goals-count').innerText = data.completed_goals;
+                    goalsInProgress = data.total_goals - data.completed_goals;
+                    document.querySelector('h1#goals-in-progress-count').innerText = goalsInProgress;
+                    fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody');
                     resetModal(editGoalModal);
+                    performActionThatUpdatesUserInfo();
                 } else {
-                    alert('Failed to complete goal: ' + data.message);
+                    showAlert('Failed to complete goal: ' + data.message);
                 }
             })
             .catch(error => {
@@ -1087,15 +1484,14 @@ document.addEventListener("DOMContentLoaded", () => {
                     priorityLevel: priorityLevel,
                     goalCategory: goalCategory,
                     description: description,
-                    treeStage: treeStage,
                     tasks: tasks
                 })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('Goal updated successfully!');
-                    const row = document.querySelector(`tr[data-goal-id="${goalId}"]`);
+                    showAlert('Goal updated successfully!');
+                    const row = document.querySelector(`#goalsTable tr[data-goal-id="${goalId}"]`);
                     if (row) {
                         row.querySelector('td:nth-child(1)').textContent = goalName;
                         row.querySelector('td:nth-child(2)').textContent = dueDate;
@@ -1115,11 +1511,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         // Reapply the category filter to ensure the row is displayed in the correct category
                         const activeCategory = document.querySelector('.goals-categories-container .category-active').getAttribute('data-category');
                         filterGoalsByCategory(activeCategory);
+                        fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody'); // Ensure that progress is dynamically updated for goals when save button is clicked
 
                     }
                     resetModal(editGoalModal);
                 } else {
-                    alert('Failed to update goal: ' + data.message);
+                    showAlert('Failed to update goal: ' + data.message);
                 }
             })
             .catch(error => {
@@ -1134,13 +1531,14 @@ document.getElementById('goalsTable').addEventListener('click', function(event) 
     if (event.target && event.target.classList.contains('delete-goal-button')) {
         const button = event.target;
         const goalId = button.getAttribute('data-goal-id');
-        if (confirm("Are you sure you want to delete this goal?")) {
-            fetch(`/delete_goal/${goalId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
+        showPrompt('customPromptConfirmationGoal', 'promptSubmitButtonConfirmationGoal');
+
+        // Remove any existing event listeners on the OK button to avoid multiple triggers
+        const submitButton = document.getElementById("promptSubmitButtonConfirmationGoal");
+        submitButton.replaceWith(submitButton.cloneNode(true));
+
+        // Handle OK button click
+        document.getElementById("promptSubmitButtonConfirmationGoal").addEventListener("click", function() {
             // Send a DELETE request if all tasks are completed
             fetch(`/delete_goal/${goalId}`, {
                 method: 'DELETE',
@@ -1151,82 +1549,29 @@ document.getElementById('goalsTable').addEventListener('click', function(event) 
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const row = document.querySelector(`tr[data-goal-id="${goalId}"]`);
+                    const row = document.querySelector(`#goalsTable tr[data-goal-id="${goalId}"]`);
                     if (row) {
-                        row.remove();
+                        row.remove(); // Remove goal from table
                     }
+                    // Update the total goals count
+                    document.querySelector('h1#total-goals-count').innerText = data.total_goals;
+                    goalsInProgress = data.total_goals - data.completed_goals;
+                    document.querySelector('h1#goals-in-progress-count').innerText = goalsInProgress;
+                    fetchAndPopulateGoals('/upcoming_goals', '#upcomingGoalsTable tbody');
                     resetModal(editGoalModal);
+                    closePrompt('customPromptConfirmationGoal');
                 } else {
-                    alert('Failed to delete goal: ' + data.message);
+                    showAlert('Failed to delete goal: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-            });
-        }
+            });    
+        });
     }
 });
 
-function addTasks() {
-    // Create a new task div
-    const newTask = document.createElement('div');
-    newTask.className = 'task-content';
-    
-    // Create label for the task
-    const newLabel = document.createElement('div');
-    newLabel.className = 'task-label';
-    newLabel.contentEditable = true; // Make the label editable
-    newLabel.textContent = 'Title';
-    newTask.appendChild(newLabel);
 
-    // Create delete button for task
-    const deleteButton = document.createElement('div');
-    deleteButton.className = 'delete-task-button';
-    deleteButton.onclick = function() {
-        newTask.remove(); // Remove the task div
-    };
-    newTask.appendChild(deleteButton);
-
-    const clickableArea = document.createElement('div');
-    clickableArea.className = 'clickable-area';
-    newTask.appendChild(clickableArea);
-
-    // Add an onclick event to show/hide information
-    clickableArea.onclick = function() {
-        toggleInfo(newTask);
-    };
-    
-    // Create text div for the task
-    const newText = document.createElement('div');
-    newText.className = 'task-text';
-    newText.contentEditable = true;
-    newText.textContent = '';
-    newTask.appendChild(newText);
-
-    // Find the container to insert new task
-    const container = document.getElementById('task-container');
-    if (container) {
-        // Insert the new task before the add button if it exists
-        const addButton = container.querySelector('.add-task-button');
-        if (addButton) {
-            container.insertBefore(newTask, addButton);
-        } else {
-            container.appendChild(newTask); // Fallback if addButton is not found
-        }
-    } else {
-        console.error('task-container not found in DOM');
-    }
-}
-
-function toggleInfo(taskContent) {
-    const taskText = taskContent.querySelector('.task-text');
-
-    if (taskText.style.display === 'none') {
-        taskText.style.display = 'block';
-    } else {
-        taskText.style.display = 'none';
-    }
-}
 
 // Apply click event listener and initial visibility for existing task
 document.addEventListener("DOMContentLoaded", function() {
@@ -1271,16 +1616,19 @@ let currentIndex = 0;
 const treeImage = document.getElementById('tree-image');
 const treeName = document.getElementById('tree-name');
 
+// When previous arrow is clicked, go back one element in the list
 document.getElementById('prev').addEventListener('click', () => {
     currentIndex = (currentIndex === 0) ? trees.length - 1 : currentIndex - 1;
     updateTree();
 });
 
+// When next arrow is clicked, go forward one element in the list
 document.getElementById('next').addEventListener('click', () => {
     currentIndex = (currentIndex === trees.length - 1) ? 0 : currentIndex + 1;
     updateTree();
 });
 
+// Change tree image
 function updateTree() {
     const currentTree = trees[currentIndex];
     treeImage.src = currentTree.image;
@@ -1311,8 +1659,8 @@ const treeStages = {
     ]
 };
 
-// Function to update tree stage
-function updateTreeStage(goalId, isIncrement) {
+// Function to update tree stage (grow the tree)
+function updateTreeStage(goalId) {
     fetchGoal(goalId)
     .then(data => {
         if (data.success) {
@@ -1323,8 +1671,19 @@ function updateTreeStage(goalId, isIncrement) {
             const completedTasks = Array.from(document.querySelectorAll('.task-content'))
                                         .filter(task => task.classList.contains('completed')).length;
 
-            // No need to adjust completed tasks since tasks can't be unmarked
-            const treeStage = Math.max(1, Math.ceil((completedTasks / totalTasks) * 3));
+
+            const completionRatio = completedTasks / totalTasks;
+            // Determine the tree stage based on the completion ratio
+            let treeStage;
+            if (completionRatio === 1) {
+                treeStage = 3;
+            } else if (completionRatio >= 0.67) {
+                treeStage = 2;
+            } else if (completionRatio >= 0.33) {
+                treeStage = 2;  // you can change this to treeStage = 2 if you prefer it to transition later
+            } else {
+                treeStage = 1; 
+            }
 
             const treeImageEdit = document.getElementById('tree-image-edit');
             const stageImages = treeStages[treeClassName];
@@ -1332,9 +1691,8 @@ function updateTreeStage(goalId, isIncrement) {
             // Update tree image if valid stage is found
             if (stageImages && stageImages[treeStage - 1]) {
                 const stageInfo = stageImages[treeStage - 1];
-                treeImageEdit.src = stageInfo.image;
+                treeImageEdit.src = stageInfo.image; 
                 treeImageEdit.className = stageInfo.className;
-                console.log('Tree Image Updated:', treeImageEdit.src, treeImageEdit.className);
 
                 // Add growth animation class
                 treeImageEdit.classList.add('tree-grow');
@@ -1347,7 +1705,7 @@ function updateTreeStage(goalId, isIncrement) {
                 console.error('Invalid tree stage:', treeStage);
             }
         } else {
-            alert('Failed to fetch goal data: ' + data.message);
+            showAlert('Failed to fetch goal data: ' + data.message);
         }
     })
     .catch(error => {
@@ -1355,9 +1713,25 @@ function updateTreeStage(goalId, isIncrement) {
     });
 }
 
-function updateTreeInfo(treeName, treeStage) {
-    const treeImage = document.getElementById('tree-image-edit');
+// Function to fetch tree info (tree name, tree stage) when opening edit modal
+function fetchTreeInfo(treeName, totalTasks, completedTasks) {
+    const treeImage = document.getElementById('tree-image-edit'); 
     const treeNameElement = document.getElementById('tree-name-edit');
+
+    // Calculate the completion ratio
+    const completionRatio = completedTasks / totalTasks;
+
+    // Determine the tree stage based on the completion ratio
+    let treeStage;
+    if (completionRatio === 1) {
+        treeStage = 3;
+    } else if (completionRatio >= 0.67) {
+        treeStage = 2;
+    } else if (completionRatio >= 0.33) {
+        treeStage = 2; 
+    } else {
+        treeStage = 1;
+    }
 
     // Find the tree stages by its name
     const stages = treeStages[treeName];
